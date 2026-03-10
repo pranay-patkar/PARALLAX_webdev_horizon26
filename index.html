@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>OpsPulse — Quick Commerce Intelligence</title>
+<meta name="description" content="OpsPulse: Real-time quick commerce business health dashboard."/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{--page-bg:#f0f2f5;--card-bg:#ffffff;--navbar-bg:#0f1923;--navbar-text:#ffffff;--border:#e2e5ea;--text-primary:#16213e;--text-muted:#6b7280;--text-faint:#9ca3af;--orange:#f97316;--blue:#0073bb;--green:#16a34a;--red:#dc2626;--yellow:#d97706;--card-shadow:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.04);--breadcrumb-bg:#e8eaed;--input-focus-ring:rgba(0,115,187,0.1)}
+[data-theme="dark"]{--page-bg:#0d1117;--card-bg:#161b22;--navbar-bg:#010409;--navbar-text:#e6edf3;--border:#30363d;--text-primary:#f0f6fc;--text-muted:#9da5b0;--text-faint:#6e7681;--orange:#f97316;--blue:#58a6ff;--green:#56d364;--red:#ff7b72;--yellow:#e3b341;--card-shadow:0 1px 4px rgba(0,0,0,0.5),0 2px 6px rgba(0,0,0,0.35);--breadcrumb-bg:#161b22;--input-focus-ring:rgba(56,139,253,0.2)}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;-webkit-font-smoothing:antialiased;background:var(--page-bg);color:var(--text-primary);transition:background-color .3s ease,color .3s ease}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;border:none;outline:none}
+input,select,textarea{font-family:'Plus Jakarta Sans',sans-serif;outline:none}
+.mono{font-family:'IBM Plex Mono',monospace}
+/* BUTTONS */
+.btn-primary{background:var(--orange);color:#fff;border:none;border-radius:6px;padding:0 16px;height:36px;font-size:14px;font-weight:600;transition:background .15s,transform .1s;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn-primary:hover{background:#ea6c10}
+.btn-primary:active{transform:scale(.98)}
+.btn-primary.full{width:100%;height:40px}
+.btn-secondary{background:var(--card-bg);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:0 16px;height:36px;font-size:14px;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn-secondary:hover{background:var(--page-bg)}
+.btn-ghost{background:transparent;color:var(--blue);border:none;padding:0;font-weight:500;font-size:13px;transition:all .15s;cursor:pointer}
+.btn-ghost:hover{text-decoration:underline}
+.btn-danger{background:var(--card-bg);color:var(--red);border:1px solid var(--red);border-radius:6px;padding:0 16px;height:36px;font-size:14px;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;justify-content:center}
+.btn-danger:hover{background:rgba(220,38,38,0.06)}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600;line-height:1.4}
+.badge-crisis{background:rgba(220,38,38,0.1);color:var(--red)}
+.badge-opportunity{background:rgba(22,163,74,0.1);color:var(--green)}
+.badge-anomaly{background:rgba(217,119,6,0.1);color:var(--yellow)}
+.badge-healthy{background:rgba(107,114,128,0.1);color:var(--text-muted)}
+.badge-owner{background:var(--orange);color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600}
+.badge-manager{background:var(--blue);color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600}
+/* CARDS */
+.card{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;box-shadow:var(--card-shadow);padding:20px 24px;transition:background-color .3s ease,border-color .3s ease}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.card-title{font-size:15px;font-weight:600;color:var(--text-primary)}
+.card-subtitle{font-size:12px;color:var(--text-muted);margin-top:2px}
+/* AUTH SCREENS */
+.auth-screen{display:none;min-height:100vh}
+.auth-split{display:grid;grid-template-columns:45% 55%;min-height:100vh}
+.auth-brand{background:#0f1923;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px 48px;position:relative;overflow:hidden}
+.auth-brand::before{content:'';position:absolute;inset:0;background:radial-gradient(circle 1.5px at center,rgba(249,115,22,0.08) 0%,transparent 100%);background-size:24px 24px}
+.auth-brand-content{position:relative;z-index:1;max-width:380px}
+.auth-brand .brand-logo{font-family:'IBM Plex Mono',monospace;font-size:36px;font-weight:700;color:var(--orange);margin-bottom:12px}
+.auth-brand .brand-tagline{font-size:16px;color:rgba(255,255,255,0.6);font-weight:300;line-height:1.6;margin-bottom:40px}
+.auth-brand .brand-features{list-style:none;display:flex;flex-direction:column;gap:0}
+.auth-brand .brand-feature{padding:14px 0;border-top:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.55);font-size:14px;display:flex;align-items:center;gap:10px}
+.auth-brand .brand-feature:last-child{border-bottom:1px solid rgba(255,255,255,0.08)}
+.auth-brand .brand-feature .arrow{color:var(--orange);font-weight:600}
+.auth-brand .brand-trust{position:absolute;bottom:40px;left:48px;font-size:12px;color:rgba(255,255,255,0.25)}
+.auth-form-panel{display:flex;align-items:center;justify-content:center;padding:40px;background:var(--page-bg);transition:background-color .3s ease}
+.auth-card{width:100%;max-width:400px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:40px;box-shadow:var(--card-shadow);transition:background-color .3s ease,border-color .3s ease}
+.auth-card.signup{max-width:460px}
+.auth-card h2{font-size:22px;font-weight:700;color:var(--text-primary);margin-bottom:6px}
+.auth-card .auth-sub{font-size:13px;color:var(--text-muted);margin-bottom:24px}
+.auth-divider{height:1px;background:var(--border);margin:20px 0}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px}
+.form-input{width:100%;height:40px;border:1px solid var(--border);border-radius:6px;padding:0 12px;font-size:14px;color:var(--text-primary);background:var(--card-bg);transition:border-color .15s,box-shadow .15s,background-color .3s ease}
+.form-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--input-focus-ring)}
+.form-input::placeholder{color:var(--text-faint)}
+.form-input.error{border-color:var(--red)}
+.field-error{color:var(--red);font-size:11px;margin-top:4px;display:none}
+select.form-input{appearance:none;cursor:pointer;padding-right:32px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.pw-wrapper{position:relative}
+.pw-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;color:var(--text-muted);font-size:14px;padding:2px;cursor:pointer}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-note{font-size:11px;color:var(--text-faint);margin-top:3px}
+.auth-error{color:var(--red);font-size:12px;margin-top:8px;display:none}
+.auth-footer{display:flex;justify-content:space-between;align-items:center;margin-top:16px;font-size:13px}
+.auth-footer a,.auth-footer span{color:var(--blue);cursor:pointer;font-weight:500}
+.auth-footer a:hover,.auth-footer span:hover{text-decoration:underline}
+/* PROGRESS BAR */
+.progress-wrap{margin-bottom:24px}
+.progress-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:8px}
+.progress-fill{height:100%;background:var(--orange);border-radius:2px;transition:width .4s ease}
+.progress-label{font-size:12px;color:var(--text-muted)}
+/* ROLE CARDS (signup) */
+.role-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.role-card{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:18px 16px;cursor:pointer;transition:all .2s;position:relative}
+.role-card:hover{border-color:var(--text-muted)}
+.role-card.selected{border:2px solid var(--orange);background:rgba(249,115,22,0.04)}
+.role-card.selected::after{content:'✓';position:absolute;top:10px;right:10px;background:var(--orange);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.role-card .rc-icon{font-size:22px;margin-bottom:8px}
+.role-card .rc-title{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:4px}
+.role-card .rc-desc{font-size:11px;color:var(--text-muted);line-height:1.4}
+.step-actions{display:flex;justify-content:space-between;align-items:center;margin-top:24px}
+.hours-row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}
+.hours-sep{color:var(--text-muted);font-size:12px}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--card-bg);border:1px solid var(--border);border-left:4px solid var(--green);border-radius:6px;padding:14px 20px;font-size:14px;font-weight:500;color:var(--text-primary);box-shadow:var(--card-shadow);z-index:10000;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .3s,transform .3s;max-width:360px}
+.toast.show{opacity:1;transform:translateY(0);pointer-events:auto}
+/* DASHBOARD */
+.dashboard-shell{display:none;flex-direction:column;height:100vh;overflow:hidden}
+/* TOP NAV */
+.topnav{height:52px;background:var(--navbar-bg);display:flex;align-items:center;padding:0 20px;gap:0;flex-shrink:0;z-index:100}
+.topnav-logo{font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:700;color:var(--orange);margin-right:16px;display:flex;align-items:center;gap:6px}
+.topnav-logo .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--orange)}
+.topnav-sep{width:1px;height:24px;background:rgba(255,255,255,0.15);margin-right:16px}
+.topnav-links{display:flex;align-items:center;gap:0;flex:1}
+.topnav-link{color:rgba(255,255,255,0.65);font-size:14px;font-weight:400;padding:14px 16px;border-bottom:2px solid transparent;transition:all .15s;cursor:pointer;white-space:nowrap}
+.topnav-link:hover{color:#fff}
+.topnav-link.active{color:#fff;border-bottom-color:var(--orange)}
+.topnav-right{display:flex;align-items:center;gap:14px;margin-left:auto}
+/* THEME TOGGLE */
+.theme-toggle{display:flex;align-items:center;gap:8px}
+.toggle-label{font-size:11px;color:rgba(255,255,255,0.4);font-weight:400;transition:all .15s;cursor:pointer}
+.toggle-label.active{color:rgba(255,255,255,0.9);font-weight:600}
+.toggle-track{width:44px;height:24px;background:rgba(255,255,255,0.15);border-radius:12px;cursor:pointer;position:relative;transition:background .3s}
+[data-theme="dark"] .toggle-track{background:#388bfd}
+.toggle-thumb{width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:transform .3s ease}
+/* USER MENU */
+.user-menu-wrap{position:relative}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;cursor:pointer}
+.user-dropdown{display:none;position:absolute;top:44px;right:0;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;box-shadow:var(--card-shadow);width:240px;z-index:300;padding:0;overflow:hidden}
+.user-dropdown.open{display:block}
+.ud-header{padding:16px;display:flex;gap:12px;align-items:center;border-bottom:1px solid var(--border)}
+.ud-avatar{width:36px;height:36px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;flex-shrink:0}
+.ud-info .ud-name{font-weight:600;font-size:14px;color:var(--text-primary)}
+.ud-info .ud-meta{font-size:11px;color:var(--text-muted);margin-top:2px}
+.ud-actions{padding:6px 0}
+.ud-action{display:block;width:100%;text-align:left;padding:10px 16px;font-size:13px;color:var(--text-primary);background:none;border:none;cursor:pointer;transition:background .1s}
+.ud-action:hover{background:var(--page-bg)}
+.ud-action.danger{color:var(--red)}
+/* BREADCRUMB */
+.breadcrumb-bar{height:36px;background:var(--breadcrumb-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;font-size:13px;color:var(--text-muted);transition:background-color .3s ease,border-color .3s ease;flex-shrink:0}
+.breadcrumb-bar span{margin:0 6px;color:var(--text-faint)}
+.breadcrumb-bar .bc-current{color:var(--text-primary);font-weight:500}
+/* MAIN */
+.main-scroll{flex:1;overflow-y:auto;padding:24px;transition:background-color .3s ease}
+.main-inner{max-width:1200px;margin:0 auto}
+/* PAGE HEADER */
+.page-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+.ph-title{font-size:24px;font-weight:700;color:var(--text-primary)}
+.ph-subtitle{font-size:13px;color:var(--text-muted);margin-top:4px}
+.ph-right{display:flex;align-items:center;gap:12px}
+.ph-updated{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text-faint)}
+/* SCENARIO DROPDOWN */
+.scenario-dropdown{position:relative}
+.scenario-trigger{cursor:pointer}
+.scenario-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;box-shadow:var(--card-shadow);width:240px;z-index:200;padding:4px 0;overflow:hidden}
+.scenario-menu.open{display:block}
+.scenario-menu-item{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:13px;color:var(--text-primary);cursor:pointer;transition:background .1s}
+.scenario-menu-item:hover{background:rgba(0,115,187,0.06)}
+.scenario-menu-item.active{font-weight:600}
+.scenario-menu-item .check{width:16px;color:var(--orange);font-weight:700;font-size:14px}
+.scenario-menu-sep{height:1px;background:var(--border);margin:4px 0}
+/* ALERT BANNER */
+.alert-banner{display:none;border-radius:6px;padding:0 18px;height:44px;align-items:center;gap:10px;font-size:13px;margin-bottom:16px;border-left:4px solid;transition:all .3s}
+.alert-banner.show{display:flex}
+.alert-banner.crisis{border-color:var(--red);background:rgba(220,38,38,0.05);color:var(--red)}
+.alert-banner.opportunity{border-color:var(--green);background:rgba(22,163,74,0.05);color:var(--green)}
+.alert-banner.anomaly{border-color:var(--yellow);background:rgba(217,119,6,0.05);color:var(--yellow)}
+.alert-banner .ab-time{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-faint)}
+/* STRESS SCORE */
+.stress-card{margin-bottom:20px}
+.stress-body{display:flex;gap:40px;align-items:flex-start}
+.stress-left{flex-shrink:0}
+.stress-score{font-family:'IBM Plex Mono',monospace;font-size:64px;font-weight:700;line-height:1;color:var(--text-primary)}
+.stress-status{font-size:13px;font-weight:600;margin-top:6px}
+.stress-status.healthy{color:var(--green)}
+.stress-status.caution{color:var(--yellow)}
+.stress-status.crisis{color:var(--red)}
+.stress-bars{flex:1;display:flex;flex-direction:column;gap:14px;padding-top:8px}
+.sb-row{display:flex;align-items:center;gap:12px}
+.sb-label{font-size:12px;color:var(--text-muted);width:90px;flex-shrink:0}
+.sb-track{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.sb-fill{height:100%;border-radius:2px;transition:width .6s ease}
+.sb-val{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--text-primary);width:30px;text-align:right}
+/* KPI ROW */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.kpi-card .kpi-label{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:8px}
+.kpi-card .kpi-value{font-family:'IBM Plex Mono',monospace;font-size:32px;font-weight:700;color:var(--text-primary);line-height:1}
+.kpi-card .kpi-change{font-size:12px;margin-top:8px;font-weight:500}
+.kpi-change.up{color:var(--green)}
+.kpi-change.down{color:var(--red)}
+/* GRID */
+.dash-grid{display:grid;gap:16px;margin-bottom:20px}
+.dash-grid.two-col{grid-template-columns:60% 1fr}
+.dash-grid.two-col-m{grid-template-columns:55% 1fr}
+.dash-grid.equal{grid-template-columns:1fr 1fr}
+.chart-wrap{position:relative;width:100%;min-height:200px}
+/* SPEEDOMETERS */
+.speedo-row{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.speedo-wrap{display:flex;flex-direction:column;align-items:center;padding:10px 0}
+.speedo-svg{width:200px;height:120px}
+.speedo-stats{display:flex;gap:20px;margin-top:10px}
+.speedo-stat{text-align:center}
+.speedo-stat-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted)}
+.speedo-stat-value{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;color:var(--text-primary);margin-top:2px}
+/* INVENTORY */
+.inv-list{display:flex;flex-direction:column;gap:14px}
+.inv-item .inv-header{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.inv-name{color:var(--text-primary)}
+.inv-pct{font-family:'IBM Plex Mono',monospace;font-weight:600}
+.inv-track{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.inv-fill{height:100%;border-radius:3px;transition:width .6s ease}
+/* ACTION TABLE */
+.action-table{width:100%;font-size:13px}
+.action-table .at-header{display:grid;grid-template-columns:70px 1fr 90px;padding:8px 0;border-bottom:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--text-muted);font-weight:600}
+.action-table .at-row{display:grid;grid-template-columns:70px 1fr 90px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center}
+.action-table .at-row:last-child{border-bottom:none}
+.at-priority{font-size:13px}
+.at-desc{color:var(--text-primary)}
+.at-status{font-size:11px;font-weight:500}
+/* ALERTS TABLE */
+.alert-table{width:100%}
+.alert-table .atr{display:grid;grid-template-columns:24px 1fr 80px 80px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center;font-size:13px;gap:8px}
+.alert-table .atr:last-child{border-bottom:none}
+.alert-icon{font-size:14px}
+.alert-msg{color:var(--text-primary)}
+.alert-type-badge{justify-self:center}
+.alert-ts{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-faint);text-align:right}
+/* WAR ROOM */
+.warroom{display:none;position:fixed;inset:0;z-index:9999;background:var(--page-bg);flex-direction:column;transition:background-color .3s ease}
+.warroom.open{display:flex}
+.warroom-nav{height:52px;background:var(--navbar-bg);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0}
+.warroom-nav-left{display:flex;align-items:center;gap:12px}
+.warroom-nav-left .wr-logo{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:var(--red)}
+.warroom-nav-left .wr-label{font-size:13px;color:rgba(255,255,255,0.7);font-weight:500}
+.warroom-body{flex:1;overflow-y:auto;padding:40px}
+.warroom-inner{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:60% 1fr;gap:40px}
+.wr-left .wr-tag{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--red);font-weight:700;margin-bottom:12px}
+.wr-title{font-family:'IBM Plex Mono',monospace;font-size:36px;font-weight:700;color:var(--red);animation:flicker 3s infinite;margin-bottom:16px;line-height:1.2}
+.wr-desc{font-size:16px;color:var(--text-muted);margin-bottom:8px;line-height:1.6}
+.wr-time{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text-faint);margin-bottom:28px}
+.wr-actions{display:flex;flex-direction:column;gap:8px}
+.wr-action{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;font-size:14px;color:var(--text-primary)}
+.wr-action-num{font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--red);flex-shrink:0}
+.wr-right .wr-metrics-title{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600;margin-bottom:16px}
+.wr-metric{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;margin-bottom:8px}
+.wr-metric-label{font-size:13px;color:var(--text-muted)}
+.wr-metric-val{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:700;color:var(--text-primary);margin:0 12px}
+@keyframes flicker{0%,91%,95%,100%{opacity:1}92%,93%,94%{opacity:.15}}
+/* CRISIS SCORE BADGE */
+.crisis-badge{position:fixed;bottom:20px;right:20px;z-index:500;display:none;background:var(--card-bg);border:2px solid var(--red);border-radius:8px;padding:14px 18px;box-shadow:var(--card-shadow);flex-direction:column;align-items:center;transition:all .3s}
+.crisis-badge.show{display:flex}
+.crisis-badge.pulse{animation:crisisPulse 1.5s infinite}
+.crisis-badge .cb-label{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--red);font-weight:700;margin-bottom:4px}
+.crisis-badge .cb-val{font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:700;color:var(--red)}
+.crisis-badge .cb-msg{font-size:10px;color:var(--text-muted);margin-top:4px;text-align:center}
+@keyframes crisisPulse{0%,100%{border-color:var(--red);box-shadow:0 0 0 0 rgba(220,38,38,0.3)}50%{border-color:#ff6b6b;box-shadow:0 0 0 6px rgba(220,38,38,0)}}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="loginScreen" class="auth-screen" style="display:block">
+<div class="auth-split">
+  <div class="auth-brand">
+    <div class="auth-brand-content">
+      <div class="brand-logo">OpsPulse</div>
+      <div class="brand-tagline">Quick Commerce Intelligence Platform</div>
+      <ul class="brand-features">
+        <li class="brand-feature"><span class="arrow">→</span> Real-time business health monitoring</li>
+        <li class="brand-feature"><span class="arrow">→</span> Intelligent crisis detection</li>
+        <li class="brand-feature"><span class="arrow">→</span> Role-based operational views</li>
+      </ul>
+    </div>
+    <div class="brand-trust">Trusted by quick commerce operators across India</div>
+  </div>
+  <div class="auth-form-panel">
+    <div class="auth-card">
+      <h2>Sign in to OpsPulse</h2>
+      <div class="auth-sub">Enter your credentials to access your dashboard</div>
+      <div class="auth-divider"></div>
+      <div class="form-group"><label class="form-label">Email address or phone number</label><input id="loginInput" class="form-input" type="text" placeholder="you@company.com"/></div>
+      <div class="form-group"><label class="form-label">Password</label><div class="pw-wrapper"><input id="loginPassword" class="form-input" type="password" placeholder="Enter your password"/><button class="pw-toggle" onclick="togglePw('loginPassword',this)">👁</button></div></div>
+      <button class="btn-primary full" onclick="handleLogin()">Sign In</button>
+      <div id="loginError" class="auth-error"></div>
+      <div class="auth-footer"><span onclick="alert('Password reset not available in demo mode.')">Forgot password?</span><span onclick="showScreen('signup')">Create account →</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ===== SIGNUP ===== -->
+<div id="signupScreen" class="auth-screen">
+<div class="auth-split">
+  <div class="auth-brand">
+    <div class="auth-brand-content">
+      <div class="brand-logo">OpsPulse</div>
+      <div class="brand-tagline">Quick Commerce Intelligence Platform</div>
+      <ul class="brand-features">
+        <li class="brand-feature"><span class="arrow">→</span> Real-time business health monitoring</li>
+        <li class="brand-feature"><span class="arrow">→</span> Intelligent crisis detection</li>
+        <li class="brand-feature"><span class="arrow">→</span> Role-based operational views</li>
+      </ul>
+    </div>
+    <div class="brand-trust">Trusted by quick commerce operators across India</div>
+  </div>
+  <div class="auth-form-panel">
+    <div class="auth-card signup">
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-fill" id="progressFill" style="width:50%"></div></div><div class="progress-label" id="progressLabel">Step 1 of 2 — Personal Information</div></div>
+      <div id="signupStep1" style="display:block">
+        <h2>Create your account</h2>
+        <div class="auth-sub">Join OpsPulse to monitor your business in real time</div>
+        <div class="auth-divider"></div>
+        <div class="form-group"><label class="form-label">Full Name *</label><input id="suName" class="form-input" placeholder="Arjun Mehta"/><div class="field-error" id="err-suName"></div></div>
+        <div class="form-group"><label class="form-label">Email Address *</label><input id="suEmail" class="form-input" type="email" placeholder="arjun@business.com"/><div class="field-error" id="err-suEmail"></div></div>
+        <div class="form-group"><label class="form-label">Phone Number *</label><input id="suPhone" class="form-input" placeholder="+91 98765 43210"/><div class="field-error" id="err-suPhone"></div></div>
+        <div class="form-group"><label class="form-label">Password *</label><div class="pw-wrapper"><input id="suPassword" class="form-input" type="password" placeholder="Min. 8 characters"/><button class="pw-toggle" onclick="togglePw('suPassword',this)">👁</button></div><div class="field-error" id="err-suPassword"></div></div>
+        <div class="form-group"><label class="form-label">Confirm Password *</label><input id="suConfirm" class="form-input" type="password" placeholder="Repeat your password"/><div class="field-error" id="err-suConfirm"></div></div>
+        <button class="btn-primary full" onclick="signupNext()">Continue →</button>
+        <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--text-muted)">Already have an account? <span style="color:var(--blue);cursor:pointer;font-weight:500" onclick="showScreen('login')">Sign in</span></div>
+      </div>
+      <div id="signupStep2" style="display:none">
+        <h2>Business details</h2>
+        <div class="auth-sub">Tell us about your business to configure your dashboard</div>
+        <div class="auth-divider"></div>
+        <div class="form-group"><label class="form-label">Business Name *</label><input id="suBusiness" class="form-input" placeholder="SwiftBasket Pvt. Ltd."/><div class="field-error" id="err-suBusiness"></div></div>
+        <div class="form-group"><label class="form-label">City / Location *</label><input id="suCity" class="form-input" placeholder="Mumbai"/><div class="field-error" id="err-suCity"></div></div>
+        <div class="form-row"><div class="form-group"><label class="form-label">Business Size *</label><select id="suSize" class="form-input"><option value="">Select size</option><option>Solo (Just me)</option><option>Small (2–10 staff)</option><option>Medium (10–50 staff)</option><option>Large (50+ staff)</option></select></div><div class="form-group"><label class="form-label">Category *</label><select id="suCategory" class="form-input"><option value="">Select category</option><option>Grocery & Essentials</option><option>Pharmacy & Health</option><option>Electronics & Gadgets</option><option>Fashion & Apparel</option><option>Food & Beverages</option><option>Home & Kitchen</option></select></div></div>
+        <div class="form-row"><div class="form-group"><label class="form-label">Delivery Zones</label><input id="suZones" class="form-input" type="number" placeholder="e.g. 5" min="1" max="50"/></div><div class="form-group"><label class="form-label">Warehouses</label><input id="suWarehouses" class="form-input" type="number" placeholder="e.g. 3" min="1" max="20"/></div></div>
+        <div class="form-group"><label class="form-label">Daily Order Target</label><input id="suOrderTarget" class="form-input" type="number" placeholder="e.g. 500 orders/day"/><div class="form-note">Used to calibrate your dashboard KPIs</div></div>
+        <div class="form-group"><label class="form-label">Operating Hours</label><div class="hours-row"><select id="suHoursOpen" class="form-input"></select><span class="hours-sep">to</span><select id="suHoursClose" class="form-input"></select></div></div>
+        <div class="form-group"><label class="form-label">Your Role *</label>
+          <div class="role-cards"><div class="role-card" onclick="selectRole(this,'owner')"><div class="rc-icon">👔</div><div class="rc-title">Business Owner</div><div class="rc-desc">Full financial and growth view — revenue, MRR, stress score</div></div><div class="role-card" onclick="selectRole(this,'manager')"><div class="rc-icon">⚙️</div><div class="rc-title">Operations Manager</div><div class="rc-desc">Inventory, ops, delivery focus — stock levels, ticket queue</div></div></div>
+          <div class="field-error" id="err-suRole"></div>
+        </div>
+        <div class="step-actions"><span class="btn-ghost" onclick="signupBack()">← Back</span><button class="btn-primary" onclick="handleSignup()">Create Account</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="dashboardScreen" class="dashboard-shell">
+  <nav class="topnav">
+    <div class="topnav-logo"><span class="logo-dot"></span>OpsPulse</div>
+    <div class="topnav-sep"></div>
+    <div class="topnav-links" id="topnavLinks"></div>
+    <div class="topnav-right">
+      <div class="theme-toggle"><span class="toggle-label active" id="lightLabel">Light</span><div class="toggle-track" onclick="toggleTheme()"><div class="toggle-thumb" id="toggleThumb"></div></div><span class="toggle-label" id="darkLabel">Dark</span></div>
+      <div class="user-menu-wrap"><div class="user-avatar" id="navAvatar" onclick="document.getElementById('userDropdown').classList.toggle('open')"></div><div class="user-dropdown" id="userDropdown"><div class="ud-header"><div class="ud-avatar" id="udAvatar"></div><div class="ud-info"><div class="ud-name" id="udName"></div><div class="ud-meta" id="udMeta"></div></div></div><div class="ud-actions"><button class="ud-action danger" onclick="signOut()">Sign Out</button></div></div></div>
+    </div>
+  </nav>
+  <div class="breadcrumb-bar" id="breadcrumb">Console Home <span>›</span> Dashboard <span>›</span> <span class="bc-current">Business Health</span></div>
+  <div class="main-scroll">
+    <div class="main-inner">
+      <div class="page-header"><div><div class="ph-title" id="pageTitle"></div><div class="ph-subtitle" id="pageSubtitle"></div></div><div class="ph-right"><div class="ph-updated" id="pageUpdated"></div><div class="scenario-dropdown"><button class="btn-secondary scenario-trigger" id="scenarioTrigger" onclick="toggleScenarioMenu()">✅ Normal Operations ▾</button><div class="scenario-menu" id="scenarioMenu"></div></div></div></div>
+      <div id="alertBanner" class="alert-banner"></div>
+      <div id="stressCard" class="card stress-card"><div class="card-header"><div><div class="card-title">Business Stress Score</div></div><div class="ph-updated" id="stressTime"></div></div><div class="stress-body"><div class="stress-left"><div class="stress-score" id="scoreNumber">0</div><div class="stress-status" id="scoreStatus">Healthy</div></div><div class="stress-bars" id="stressBars"></div></div></div>
+      <div class="kpi-row" id="kpiRow"></div>
+      <!-- OWNER ONLY -->
+      <div id="ownerView" style="display:none">
+        <div class="dash-grid two-col" style="margin-bottom:16px"><div class="card"><div class="card-header"><div><div class="card-title">Delivery Time Trend</div><div class="card-subtitle">Rolling 14-point average</div></div></div><div class="chart-wrap"><canvas id="chartDelivery"></canvas></div></div><div class="card"><div class="card-header"><div><div class="card-title">Cancellation Radar</div><div class="card-subtitle">By category — this week vs last</div></div></div><div class="chart-wrap"><canvas id="chartRadar"></canvas></div></div></div>
+        <div class="card" style="margin-bottom:16px"><div class="card-header"><div><div class="card-title">Live Performance Meters</div></div><span class="btn-ghost">View details →</span></div><div class="speedo-row"><div class="speedo-wrap" id="speedoOrders"></div><div class="speedo-wrap" id="speedoRevenue"></div></div></div>
+      </div>
+      <!-- MANAGER ONLY -->
+      <div id="managerView" style="display:none">
+        <div class="dash-grid two-col-m" style="margin-bottom:16px"><div class="card"><div class="card-header"><div><div class="card-title">Stock Levels by Category</div></div></div><div class="inv-list" id="inventoryList"></div></div><div class="card"><div class="card-header"><div><div class="card-title">Delivery Performance by Hour</div></div></div><div class="chart-wrap"><canvas id="chartStacked"></canvas></div></div></div>
+        <div class="card" style="margin-bottom:16px"><div class="card-header"><div><div class="card-title">Operational Action Items</div></div><div id="actionCount" style="font-size:12px;color:var(--text-muted)"></div></div><div class="action-table" id="actionTable"></div></div>
+      </div>
+      <!-- ALERTS (both) -->
+      <div class="card" style="margin-bottom:20px"><div class="card-header"><div><div class="card-title">Live Alerts</div></div><span class="btn-ghost">View all alerts →</span></div><div class="alert-table" id="alertTable"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- WAR ROOM -->
+<div id="warRoom" class="warroom"><div class="warroom-nav"><div class="warroom-nav-left"><span class="wr-logo">🔴 OpsPulse</span><span class="wr-label">INCIDENT RESPONSE ACTIVE</span></div><button class="btn-danger" onclick="closeWarRoom()">Exit War Room ✕</button></div><div class="warroom-body"><div class="warroom-inner"><div class="wr-left"><div class="wr-tag">ACTIVE INCIDENT</div><div class="wr-title" id="wrTitle">⚠ WAR ROOM ⚠</div><div class="wr-desc" id="wrDesc"></div><div class="wr-time" id="wrTime"></div><div class="wr-actions" id="wrActions"></div></div><div class="wr-right"><div class="wr-metrics-title">Current Critical Metrics</div><div id="wrMetrics"></div></div></div></div></div>
+
+<!-- CRISIS BADGE -->
+<div class="crisis-badge" id="crisisBadge"><div class="cb-label">Crisis Score</div><div class="cb-val" id="crisisVal">0</div><div class="cb-msg" id="crisisMsg">Systems nominal</div></div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<script>
+// ===== DATA =====
+const userDB = {
+  "owner@opspulse.com":{password:"owner123",phone:"9876543210",role:"owner",name:"Arjun Mehta",business:"SwiftBasket",city:"Mumbai",size:"Medium",zones:"5",orderTarget:"200",hours:"6am–midnight",category:"Grocery",warehouses:"3",avatar:"AM"},
+  "manager@opspulse.com":{password:"ops2024",phone:"9123456780",role:"manager",name:"Priya Sharma",business:"SwiftBasket",city:"Mumbai",size:"Medium",zones:"5",orderTarget:"200",hours:"6am–midnight",category:"Grocery",warehouses:"3",avatar:"PS"}
+};
+let currentScreen='login',currentUser=null,currentRole=null,signupRole='';
+let liveData={stock:65,delivery:8,orders:120,cancel:8,revenue:62};
+let delivHistory=[],orderPeak=0,alertLog=[],activeScenario='normal';
+let delivChart=null,radarChart=null,stackedChart=null,liveInterval=null,crisisAlertShown=false;
+
+// ===== SCREEN =====
+function showScreen(n){
+  document.getElementById('loginScreen').style.display=n==='login'?'block':'none';
+  document.getElementById('signupScreen').style.display=n==='signup'?'block':'none';
+  document.getElementById('dashboardScreen').style.display=n==='dashboard'?'flex':'none';
+  currentScreen=n;
+  if(n==='signup')initSignupHours();
+}
+// ===== THEME =====
+function toggleTheme(){
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',isDark?'light':'dark');
+  document.getElementById('toggleThumb').style.transform=isDark?'translateX(0)':'translateX(20px)';
+  document.getElementById('lightLabel').classList.toggle('active',isDark);
+  document.getElementById('darkLabel').classList.toggle('active',!isDark);
+  if(delivChart)delivChart.update('none');
+  if(radarChart)radarChart.update('none');
+  if(stackedChart)stackedChart.update('none');
+}
+// ===== UTILS =====
+function togglePw(id,btn){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';btn.textContent=el.type==='password'?'👁':'👁‍🗨';}
+function showError(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='block';}
+function hideError(id){document.getElementById(id).style.display='none';}
+function showFieldError(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='block';}
+function clearFieldErrors(){document.querySelectorAll('.field-error').forEach(e=>e.style.display='none');document.querySelectorAll('.form-input.error').forEach(e=>e.classList.remove('error'));}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function clamp(v){return Math.min(100,Math.max(0,Math.round(v)));}
+
+// ===== LOGIN =====
+function handleLogin(){
+  hideError('loginError');
+  const input=document.getElementById('loginInput').value.trim();
+  const password=document.getElementById('loginPassword').value;
+  if(!input||!password){showError('loginError','Please enter your credentials.');return;}
+  let matched=null;
+  if(input.includes('@')){if(userDB[input]&&userDB[input].password===password)matched={...userDB[input],email:input};}
+  else{for(const e in userDB){if(userDB[e].phone===input&&userDB[e].password===password){matched={...userDB[e],email:e};break;}}}
+  if(matched){currentUser=matched;currentRole=matched.role;showScreen('dashboard');initDashboard();}
+  else{showError('loginError','Invalid credentials. Please check your email/phone and password.');}
+}
+document.getElementById('loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin();});
+document.getElementById('loginInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginPassword').focus();});
+
+// ===== SIGNUP =====
+function initSignupHours(){
+  const hrs=['12am','1am','2am','3am','4am','5am','6am','7am','8am','9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm','10pm','11pm'];
+  ['suHoursOpen','suHoursClose'].forEach(id=>{const s=document.getElementById(id);if(s.options.length>1)return;s.innerHTML='';hrs.forEach(h=>{const o=document.createElement('option');o.value=h;o.textContent=h;s.appendChild(o);});});
+  document.getElementById('suHoursOpen').value='6am';document.getElementById('suHoursClose').value='12am';
+}
+function selectRole(el,role){document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');signupRole=role;}
+function signupNext(){
+  clearFieldErrors();let v=true;
+  const nm=document.getElementById('suName').value.trim(),em=document.getElementById('suEmail').value.trim();
+  const ph=document.getElementById('suPhone').value.trim().replace(/[\s+]/g,'').replace(/^91/,'');
+  const pw=document.getElementById('suPassword').value,cf=document.getElementById('suConfirm').value;
+  if(nm.length<2){showFieldError('err-suName','Name must be at least 2 characters');v=false;}
+  if(!em.includes('@')||!em.includes('.')){showFieldError('err-suEmail','Enter a valid email');v=false;}
+  if(userDB[em]){showFieldError('err-suEmail','Email already registered');v=false;}
+  if(ph.length!==10||isNaN(ph)){showFieldError('err-suPhone','Enter a valid 10-digit number');v=false;}
+  if(pw.length<8){showFieldError('err-suPassword','Min 8 characters');v=false;}
+  if(pw!==cf){showFieldError('err-suConfirm','Passwords do not match');v=false;}
+  if(!v)return;
+  document.getElementById('signupStep1').style.display='none';
+  document.getElementById('signupStep2').style.display='block';
+  document.getElementById('progressFill').style.width='100%';
+  document.getElementById('progressLabel').textContent='Step 2 of 2 — Business Details';
+}
+function signupBack(){
+  document.getElementById('signupStep2').style.display='none';
+  document.getElementById('signupStep1').style.display='block';
+  document.getElementById('progressFill').style.width='50%';
+  document.getElementById('progressLabel').textContent='Step 1 of 2 — Personal Information';
+}
+function handleSignup(){
+  clearFieldErrors();let v=true;
+  const biz=document.getElementById('suBusiness').value.trim(),city=document.getElementById('suCity').value.trim();
+  const size=document.getElementById('suSize').value,cat=document.getElementById('suCategory').value;
+  if(!biz){showFieldError('err-suBusiness','Required');v=false;}
+  if(!city){showFieldError('err-suCity','Required');v=false;}
+  if(!size||!cat)v=false;
+  if(!signupRole){showFieldError('err-suRole','Please select your role');v=false;}
+  if(!v)return;
+  const email=document.getElementById('suEmail').value.trim(),name=document.getElementById('suName').value.trim();
+  const phone=document.getElementById('suPhone').value.trim().replace(/[\s+]/g,'').replace(/^91/,'');
+  const initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const u={password:document.getElementById('suPassword').value,phone,role:signupRole,name,business:biz,city,size:size.split(' ')[0],zones:document.getElementById('suZones').value||'3',orderTarget:document.getElementById('suOrderTarget').value||'200',hours:document.getElementById('suHoursOpen').value+'–'+document.getElementById('suHoursClose').value,category:cat.split(' ')[0],warehouses:document.getElementById('suWarehouses').value||'2',avatar:initials};
+  userDB[email]=u;currentUser={...u,email};currentRole=signupRole;
+  showScreen('dashboard');initDashboard();
+  showToast('✓ Account created — Welcome, '+name.split(' ')[0]);
+}
+// ===== SIGN OUT =====
+function signOut(){
+  currentUser=null;currentRole=null;
+  if(liveInterval)clearInterval(liveInterval);liveInterval=null;
+  delivChart=null;radarChart=null;stackedChart=null;
+  liveData={stock:65,delivery:8,orders:120,cancel:8,revenue:62};
+  delivHistory=[];alertLog=[];orderPeak=0;activeScenario='normal';
+  document.getElementById('userDropdown').classList.remove('open');
+  document.getElementById('loginInput').value='';document.getElementById('loginPassword').value='';
+  hideError('loginError');showScreen('login');
+}
+// ===== SCENARIOS =====
+const SCENARIOS={
+  normal:{stock:65,delivery:8,orders:120,cancel:8,revenue:62,label:'✅ Normal Operations'},
+  crisis:{stock:8,delivery:28,orders:45,cancel:45,revenue:20,label:'🔴 Full Crisis Mode'},
+  opportunity:{stock:85,delivery:7,orders:185,cancel:5,revenue:88,label:'🟢 Peak Opportunity'},
+  anomaly:{stock:28,delivery:13,orders:95,cancel:22,revenue:47,label:'🟡 Anomaly Detected'},
+  stockout:{stock:5,delivery:9,orders:160,cancel:35,revenue:55,label:'📦 Stock-Out Crisis'},
+  delivery:{stock:70,delivery:32,orders:130,cancel:28,revenue:60,label:'🛵 Delivery Meltdown'},
+  rushhour:{stock:55,delivery:12,orders:198,cancel:12,revenue:91,label:'⚡ Rush Hour Surge'},
+};
+function buildScenarioMenu(){
+  const m=document.getElementById('scenarioMenu');m.innerHTML='';
+  const groups=[['normal'],['crisis','stockout','delivery'],['opportunity','rushhour'],['anomaly']];
+  groups.forEach((g,gi)=>{
+    g.forEach(k=>{
+      const d=document.createElement('div');d.className='scenario-menu-item'+(k===activeScenario?' active':'');
+      d.innerHTML='<span class="check">'+(k===activeScenario?'✓':' ')+'</span>'+SCENARIOS[k].label;
+      d.onclick=()=>loadScenario(k);m.appendChild(d);
+    });
+    if(gi<groups.length-1){const s=document.createElement('div');s.className='scenario-menu-sep';m.appendChild(s);}
+  });
+}
+function toggleScenarioMenu(){const m=document.getElementById('scenarioMenu');m.classList.toggle('open');buildScenarioMenu();}
+function loadScenario(key){
+  liveData={...SCENARIOS[key]};delivHistory=[];activeScenario=key;
+  document.getElementById('scenarioTrigger').textContent=SCENARIOS[key].label+' ▾';
+  document.getElementById('scenarioMenu').classList.remove('open');
+  if(['crisis','stockout','delivery'].includes(key))setTimeout(()=>openWarRoom(SCENARIOS[key].label),600);
+  renderDashboard();
+}
+// ===== STRESS SCORE =====
+function calcStressScore(d){
+  const stockS=Math.min(100,d.stock),delivS=Math.max(0,100-((d.delivery-5)/35)*100);
+  const orderS=Math.min(100,(d.orders/Number(currentUser.orderTarget||200))*100);
+  const cancelS=Math.max(0,100-d.cancel*1.5);
+  return{stockS:Math.round(stockS),delivS:Math.round(delivS),orderS:Math.round(orderS),cancelS:Math.round(cancelS),total:Math.round(stockS*0.35+delivS*0.30+orderS*0.25+cancelS*0.10)};
+}
+function updateCrisisScore(score){
+  const badge=document.getElementById('crisisBadge'),val=document.getElementById('crisisVal'),msg=document.getElementById('crisisMsg');
+  const cv=100-score.total;val.textContent=cv;
+  if(cv>=60){badge.classList.add('show','pulse');msg.textContent='CRITICAL — Action required';
+    if(!crisisAlertShown&&currentScreen==='dashboard'){crisisAlertShown=true;addAlert('crisis','🚨 Crisis score '+cv+' — systems in distress');}
+  }else if(cv>=40){badge.classList.add('show');badge.classList.remove('pulse');msg.textContent='Elevated risk';crisisAlertShown=false;}
+  else{badge.classList.remove('show','pulse');crisisAlertShown=false;}
+}
+// ===== DASHBOARD INIT =====
+function initDashboard(){
+  // Nav
+  const links=document.getElementById('topnavLinks');
+  const navItems=currentRole==='owner'?['Dashboard','Orders','Delivery','Alerts']:['Dashboard','Inventory','Delivery','Alerts'];
+  links.innerHTML=navItems.map((n,i)=>'<div class="topnav-link'+(i===0?' active':'')+'" onclick="setTopNav(this)">'+n+'</div>').join('');
+  // User
+  document.getElementById('navAvatar').textContent=currentUser.avatar;
+  document.getElementById('udAvatar').textContent=currentUser.avatar;
+  document.getElementById('udName').textContent=currentUser.name;
+  const roleBadge=currentRole==='owner'?'<span class="badge-owner">Owner</span>':'<span class="badge-manager">Manager</span>';
+  document.getElementById('udMeta').innerHTML=roleBadge+' · '+currentUser.business+' · '+currentUser.city;
+  // Role views
+  document.getElementById('ownerView').style.display=currentRole==='owner'?'block':'none';
+  document.getElementById('managerView').style.display=currentRole==='manager'?'block':'none';
+  // Data
+  delivHistory=Array.from({length:14},()=>7+Math.random()*6);
+  alertLog=[];activeScenario='normal';
+  document.getElementById('scenarioTrigger').textContent='✅ Normal Operations ▾';
+  renderDashboard();initCharts();startClock();
+  if(liveInterval)clearInterval(liveInterval);
+  liveInterval=setInterval(liveUpdate,3000);
+}
+function setTopNav(el){document.querySelectorAll('.topnav-link').forEach(n=>n.classList.remove('active'));el.classList.add('active');}
+// ===== RENDER =====
+function renderDashboard(){
+  const d=liveData,score=calcStressScore(d);
+  // Header
+  if(currentRole==='owner'){document.getElementById('pageTitle').textContent='Business Health Dashboard';
+    document.getElementById('pageSubtitle').textContent=currentUser.business+' — '+currentUser.city+' · '+currentUser.category+' · '+currentUser.size;}
+  else{document.getElementById('pageTitle').textContent='Operations Dashboard';
+    document.getElementById('pageSubtitle').textContent='Ops & Delivery — '+currentUser.city+' · '+currentUser.zones+' zones active';}
+  document.getElementById('pageUpdated').textContent='Last updated: '+new Date().toLocaleTimeString();
+  document.getElementById('stressTime').textContent=new Date().toLocaleTimeString();
+  // Score
+  document.getElementById('scoreNumber').textContent=score.total;
+  const ss=document.getElementById('scoreStatus');
+  if(score.total>=70){ss.textContent='Healthy';ss.className='stress-status healthy';}
+  else if(score.total>=45){ss.textContent='Caution';ss.className='stress-status caution';}
+  else{ss.textContent='Crisis';ss.className='stress-status crisis';}
+  // Bars
+  const bars=[{l:'Stock',v:score.stockS,c:'#0073bb'},{l:'Delivery',v:score.delivS,c:'#16a34a'},{l:'Orders',v:score.orderS,c:'#f97316'},{l:'Cancel',v:score.cancelS,c:'#dc2626'}];
+  document.getElementById('stressBars').innerHTML=bars.map(b=>'<div class="sb-row"><span class="sb-label">'+b.l+'</span><div class="sb-track"><div class="sb-fill" style="width:'+b.v+'%;background:'+b.c+'"></div></div><span class="sb-val">'+b.v+'</span></div>').join('');
+  // KPIs (role-based)
+  const rev=(d.revenue/100*100000);
+  let kpis;
+  if(currentRole==='owner'){
+    kpis=[{l:'Revenue Today',v:'₹'+(rev/1000).toFixed(1)+'k',ch:d.revenue>50,ct:d.revenue>50?'+'+Math.round(d.revenue*0.12)+'% vs yesterday':'−'+Math.round((100-d.revenue)*0.08)+'% behind'},
+      {l:'Orders / Hour',v:d.orders,ch:d.orders>100,ct:d.orders>100?'↑ Active demand':'↓ Below target'},
+      {l:'Avg Delivery',v:d.delivery+'m',ch:d.delivery<=10,ct:d.delivery<=10?'Within SLA':'SLA breach risk'},
+      {l:'Cancel Rate',v:d.cancel+'%',ch:d.cancel<10,ct:d.cancel<10?'Healthy range':'↑ Elevated'}];
+  }else{
+    kpis=[{l:'Avg Delivery Time',v:d.delivery+'m',ch:d.delivery<=10,ct:d.delivery<=10?'Within SLA':'SLA breach'},
+      {l:'Cancellation Rate',v:d.cancel+'%',ch:d.cancel<10,ct:d.cancel<10?'Healthy':'↑ High'},
+      {l:'Open Tickets',v:Math.round(d.cancel*1.8),ch:d.cancel<15,ct:d.cancel<15?'Manageable':'Backlog growing'},
+      {l:'Active Partners',v:Math.round(45+d.orders*0.2),ch:true,ct:'Deployed in '+currentUser.zones+' zones'}];
+  }
+  document.getElementById('kpiRow').innerHTML=kpis.map(k=>'<div class="card kpi-card"><div class="kpi-label">'+k.l+'</div><div class="kpi-value">'+k.v+'</div><div class="kpi-change '+(k.ch?'up':'down')+'">'+k.ct+'</div></div>').join('');
+  // Speedometers (owner)
+  if(currentRole==='owner'){
+    renderSpeedometer('speedoOrders',d.orders,Number(currentUser.orderTarget||200),'ORDERS/HR',[{l:'AVG',v:Math.round(d.orders*0.85)},{l:'CAPACITY',v:currentUser.orderTarget||200},{l:'PEAK',v:Math.max(orderPeak,d.orders)}]);
+    renderSpeedometer('speedoRevenue',d.revenue,100,'₹'+(rev/1000).toFixed(0)+'k',[{l:'ACHIEVED',v:d.revenue.toFixed(1)+'%'},{l:'REMAINING',v:'₹'+((100000-rev)/1000).toFixed(1)+'k'}]);
+  }
+  // Inventory (manager)
+  if(currentRole==='manager'){
+    const inv=[{n:'🥛 Dairy & Eggs',p:clamp(d.stock+10)},{n:'🥦 Fresh Vegetables',p:clamp(d.stock-20)},{n:'🍞 Bakery',p:clamp(d.stock+5)},{n:'🧴 Personal Care',p:clamp(d.stock+25)},{n:'🥤 Beverages',p:clamp(d.stock-5)}];
+    document.getElementById('inventoryList').innerHTML=inv.map(i=>{const c=i.p>=50?'var(--green)':i.p>=15?'var(--yellow)':'var(--red)';return'<div class="inv-item"><div class="inv-header"><span class="inv-name">'+i.n+'</span><span class="inv-pct" style="color:'+c+'">'+i.p+'%</span></div><div class="inv-track"><div class="inv-fill" style="width:'+i.p+'%;background:'+c+'"></div></div></div>';}).join('');
+    // Action table
+    const acts=genActions(d);
+    document.getElementById('actionCount').textContent=acts.length+' items';
+    document.getElementById('actionTable').innerHTML='<div class="at-header"><span>Priority</span><span>Description</span><span>Status</span></div>'+acts.map(a=>'<div class="at-row"><span class="at-priority">'+a.level+'</span><span class="at-desc">'+a.text+'</span><span class="at-status badge '+(a.level.includes('🔴')?'badge-crisis':a.level.includes('🟡')?'badge-anomaly':'badge-opportunity')+'">'+(a.level.includes('🔴')?'Action req.':a.level.includes('🟡')?'Monitor':'Optional')+'</span></div>').join('');
+  }
+  updateAlertBanner(d,score);
+  renderAlerts();
+  updateCrisisScore(score);
+  if(score.total<40&&!document.getElementById('warRoom').classList.contains('open'))setTimeout(()=>openWarRoom('Score Critical: '+score.total),600);
+  updateCharts();
+}
+function genActions(d){
+  const a=[];
+  if(d.stock<15)a.push({level:'🔴 HIGH',text:'Reorder stock — avg at '+d.stock+'%'});
+  if(d.delivery>15)a.push({level:'🔴 HIGH',text:'Delivery at '+d.delivery+'m — SLA breach'});
+  if(d.cancel>30)a.push({level:'🔴 HIGH',text:'Cancel rate '+d.cancel+'% — escalate support'});
+  if(d.stock<30&&d.stock>=15)a.push({level:'🟡 MED',text:'Stock trending low at '+d.stock+'%'});
+  if(d.delivery>10&&d.delivery<=15)a.push({level:'🟡 MED',text:'Delivery trending above SLA'});
+  if(d.orders>160)a.push({level:'🟢 LOW',text:'Surge pricing opportunity — '+d.orders+'/hr'});
+  if(!a.length)a.push({level:'✅',text:'All operations nominal'});
+  return a;
+}
+// ===== SPEEDOMETER =====
+function renderSpeedometer(id,value,max,label,stats){
+  const pct=Math.min(1,Math.max(0,value/max)),cx=100,cy=100,r=75;
+  function arc(s,e){const sr=(s-90)*Math.PI/180,er=(e-90)*Math.PI/180;return'M '+(cx+r*Math.cos(sr))+' '+(cy+r*Math.sin(sr))+' A '+r+' '+r+' 0 '+(e-s>180?1:0)+' 1 '+(cx+r*Math.cos(er))+' '+(cy+r*Math.sin(er));}
+  const nRad=(-90+pct*180-90)*Math.PI/180,nx=cx+(r-15)*Math.cos(nRad),ny=cy+(r-15)*Math.sin(nRad);
+  const nc=pct<.33?'var(--green)':pct<.66?'var(--yellow)':'var(--red)';
+  const svg='<svg viewBox="0 0 200 120" class="speedo-svg"><path d="'+arc(-90,-30)+'" fill="none" stroke="var(--green)" stroke-width="8" stroke-linecap="round" opacity=".25"/><path d="'+arc(-30,30)+'" fill="none" stroke="var(--yellow)" stroke-width="8" stroke-linecap="round" opacity=".25"/><path d="'+arc(30,90)+'" fill="none" stroke="var(--red)" stroke-width="8" stroke-linecap="round" opacity=".25"/><line x1="'+cx+'" y1="'+cy+'" x2="'+nx+'" y2="'+ny+'" stroke="'+nc+'" stroke-width="2.5" stroke-linecap="round"/><circle cx="'+cx+'" cy="'+cy+'" r="4" fill="'+nc+'"/><text x="'+cx+'" y="'+(cy-8)+'" text-anchor="middle" fill="var(--text-primary)" font-family="IBM Plex Mono,monospace" font-size="20" font-weight="700">'+(typeof value==='number'?Math.round(value):value)+'</text><text x="'+cx+'" y="'+(cy+8)+'" text-anchor="middle" fill="var(--text-muted)" font-family="Plus Jakarta Sans,sans-serif" font-size="8" letter-spacing="1.5">'+label+'</text></svg>';
+  document.getElementById(id).innerHTML=svg+'<div class="speedo-stats">'+stats.map(s=>'<div class="speedo-stat"><div class="speedo-stat-label">'+s.l+'</div><div class="speedo-stat-value">'+s.v+'</div></div>').join('')+'</div>';
+}
+// ===== CHARTS =====
+function initCharts(){
+  Chart.defaults.color='var(--text-muted)';Chart.defaults.borderColor='var(--border)';
+  Chart.defaults.font.family="'Plus Jakarta Sans',sans-serif";Chart.defaults.font.size=11;
+  if(delivChart){delivChart.destroy();delivChart=null;}
+  if(radarChart){radarChart.destroy();radarChart=null;}
+  if(stackedChart){stackedChart.destroy();stackedChart=null;}
+  // Delivery line (owner)
+  if(currentRole==='owner'){
+    delivChart=new Chart(document.getElementById('chartDelivery').getContext('2d'),{type:'line',data:{labels:Array.from({length:14},(_,i)=>'T-'+(13-i)),datasets:[{label:'Avg Delivery (min)',data:[...delivHistory],borderColor:'#0073bb',backgroundColor:'rgba(0,115,187,0.06)',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#0073bb',pointBorderColor:'var(--card-bg)',pointBorderWidth:2},{label:'SLA Target',data:Array(14).fill(10),borderColor:'#dc2626',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false}]},options:{responsive:true,animation:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:12}}},scales:{x:{grid:{display:false}},y:{min:0,max:45,grid:{color:'var(--border)'},ticks:{callback:v=>v+'m'}}}}});
+    radarChart=new Chart(document.getElementById('chartRadar').getContext('2d'),{type:'radar',data:{labels:['Out of Stock','Long Wait','Wrong Item','App Bug','Changed Mind'],datasets:[{label:'This Week',data:[40,30,15,20,35],borderColor:'#dc2626',backgroundColor:'rgba(220,38,38,0.08)',pointBackgroundColor:'#dc2626',pointBorderColor:'var(--card-bg)',pointRadius:4,borderWidth:2},{label:'Last Week',data:[55,45,20,10,30],borderColor:'var(--text-faint)',backgroundColor:'rgba(0,0,0,0.02)',borderDash:[4,3],pointRadius:3,borderWidth:1.5}]},options:{responsive:true,scales:{r:{min:0,max:100,grid:{color:'var(--border)'},angleLines:{color:'var(--border)'},pointLabels:{color:'var(--text-muted)',font:{size:10}},ticks:{display:false}}},plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:10}}}}});
+  }
+  // Stacked bar (manager)
+  if(currentRole==='manager'){
+    stackedChart=new Chart(document.getElementById('chartStacked').getContext('2d'),{type:'bar',data:{labels:['10am','11am','12pm','1pm','2pm','3pm','4pm','Now'],datasets:[{label:'On-Time',data:[45,52,38,61,55,48,58,42],backgroundColor:'#0073bb',borderRadius:4,stack:'d'},{label:'Delayed',data:[5,8,12,4,9,7,5,11],backgroundColor:'#dc2626',borderRadius:4,stack:'d'}]},options:{responsive:true,animation:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:10}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'var(--border)'}}}}});
+  }
+}
+function updateCharts(){
+  if(delivChart){delivChart.data.datasets[0].data=[...delivHistory];delivChart.update('none');}
+  if(radarChart){const c=liveData.cancel;radarChart.data.datasets[0].data=[clamp(c*1.2+10),clamp(c*0.8+5),clamp(c*0.4),clamp(c*0.5+5),clamp(c*0.9)];radarChart.update('none');}
+  if(stackedChart){const ot=Math.round(40+Math.random()*25),dl=Math.round(Math.max(2,liveData.delivery-5+Math.random()*5));stackedChart.data.datasets[0].data.shift();stackedChart.data.datasets[0].data.push(ot);stackedChart.data.datasets[1].data.shift();stackedChart.data.datasets[1].data.push(dl);stackedChart.update('none');}
+}
+// ===== ALERTS =====
+function addAlert(type,msg){alertLog.unshift({type,msg,time:new Date().toLocaleTimeString()});if(alertLog.length>20)alertLog.pop();}
+function updateAlertBanner(d,score){
+  const b=document.getElementById('alertBanner');
+  if(d.stock<15||d.delivery>15||d.cancel>30||score.total<40){b.className='alert-banner show crisis';b.innerHTML='🚨 '+(d.stock<15?'Stock critically low ('+d.stock+'%). ':'')+( d.delivery>15?'Delivery SLA breached ('+d.delivery+'m). ':'')+(d.cancel>30?'Cancel rate spiking ('+d.cancel+'%). ':'')+'<span class="ab-time">'+new Date().toLocaleTimeString()+'</span>';addAlert('crisis',b.textContent);}
+  else if(d.orders>160||d.revenue>80){b.className='alert-banner show opportunity';b.innerHTML='🟢 '+(d.orders>160?'Order surge at '+d.orders+'/hr. ':'')+(d.revenue>80?'Revenue on track ('+d.revenue+'%). ':'')+'<span class="ab-time">'+new Date().toLocaleTimeString()+'</span>';addAlert('opportunity',b.textContent);}
+  else if((d.delivery>10&&d.delivery<=15)||(d.cancel>15&&d.cancel<=30)||(d.stock>=15&&d.stock<30)){b.className='alert-banner show anomaly';b.innerHTML='⚠️ '+(d.stock<30?'Stock at '+d.stock+'%. ':'')+(d.delivery>10?'Delivery '+d.delivery+'m. ':'')+(d.cancel>15?'Cancel rate '+d.cancel+'%. ':'')+'<span class="ab-time">'+new Date().toLocaleTimeString()+'</span>';addAlert('anomaly',b.textContent);}
+  else{b.className='alert-banner';b.classList.remove('show');}
+}
+function renderAlerts(){
+  const t=document.getElementById('alertTable');
+  if(!alertLog.length){t.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-faint);font-size:13px">No alerts — all systems healthy</div>';return;}
+  t.innerHTML=alertLog.slice(0,8).map(a=>{
+    const icon=a.type==='crisis'?'🔴':a.type==='opportunity'?'🟢':'⚠️';
+    const badge=a.type==='crisis'?'badge-crisis':a.type==='opportunity'?'badge-opportunity':'badge-anomaly';
+    const label=a.type==='crisis'?'Crisis':a.type==='opportunity'?'Opportunity':'Anomaly';
+    return'<div class="atr"><span class="alert-icon">'+icon+'</span><span class="alert-msg">'+a.msg.substring(0,80)+'</span><span class="badge alert-type-badge '+badge+'">'+label+'</span><span class="alert-ts">'+a.time+'</span></div>';
+  }).join('');
+}
+// ===== WAR ROOM =====
+function openWarRoom(label){
+  const d=liveData;
+  document.getElementById('wrTitle').textContent='⚠ WAR ROOM ⚠';
+  document.getElementById('wrDesc').textContent='Scenario: '+label+' — Multiple critical thresholds breached simultaneously.';
+  document.getElementById('wrTime').textContent='Incident started at '+new Date().toLocaleTimeString();
+  const acts=['Halt new orders in affected zones','Emergency restock protocol initiated','Alert customer success team','Reassign delivery partners to critical zones','Notify stakeholders via broadcast'];
+  document.getElementById('wrActions').innerHTML=acts.map((a,i)=>'<div class="wr-action"><span class="wr-action-num">'+(i+1)+'.</span><span>'+a+'</span></div>').join('');
+  const score=calcStressScore(d);
+  document.getElementById('wrMetrics').innerHTML=[
+    {l:'Stock Level',v:d.stock+'%',s:d.stock<15?'badge-crisis':d.stock<30?'badge-anomaly':'badge-healthy',t:d.stock<15?'CRITICAL':d.stock<30?'LOW':'OK'},
+    {l:'Delivery Time',v:d.delivery+'min',s:d.delivery>15?'badge-crisis':d.delivery>10?'badge-anomaly':'badge-healthy',t:d.delivery>15?'BREACH':d.delivery>10?'RISK':'OK'},
+    {l:'Cancel Rate',v:d.cancel+'%',s:d.cancel>30?'badge-crisis':d.cancel>15?'badge-anomaly':'badge-healthy',t:d.cancel>30?'HIGH':d.cancel>15?'ELEVATED':'OK'},
+    {l:'Stress Score',v:score.total,s:score.total<40?'badge-crisis':score.total<70?'badge-anomaly':'badge-healthy',t:score.total<40?'CRISIS':score.total<70?'CAUTION':'OK'}
+  ].map(m=>'<div class="wr-metric"><span class="wr-metric-label">'+m.l+'</span><span class="wr-metric-val mono">'+m.v+'</span><span class="badge '+m.s+'">'+m.t+'</span></div>').join('');
+  document.getElementById('warRoom').classList.add('open');
+}
+function closeWarRoom(){document.getElementById('warRoom').classList.remove('open');}
+// ===== LIVE SIM =====
+function nudge(v,r,mn,mx){return Math.min(mx,Math.max(mn,v+(Math.random()-0.45)*r));}
+function liveUpdate(){
+  liveData.stock=Math.round(nudge(liveData.stock,3,0,100));
+  liveData.delivery=parseFloat(nudge(liveData.delivery,1,5,40).toFixed(1));
+  liveData.orders=Math.round(nudge(liveData.orders,12,5,200));
+  liveData.cancel=Math.round(nudge(liveData.cancel,2,0,60));
+  liveData.revenue=parseFloat(Math.min(100,liveData.revenue+Math.random()*0.8).toFixed(1));
+  delivHistory.push(liveData.delivery);if(delivHistory.length>14)delivHistory.shift();
+  if(liveData.orders>orderPeak)orderPeak=liveData.orders;
+  renderDashboard();
+}
+function startClock(){function t(){const el=document.getElementById('pageUpdated');if(el)el.textContent='Last updated: '+new Date().toLocaleTimeString();}t();}
+// Close dropdowns on outside click
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.user-menu-wrap'))document.getElementById('userDropdown').classList.remove('open');
+  if(!e.target.closest('.scenario-dropdown'))document.getElementById('scenarioMenu').classList.remove('open');
+});
+// ===== INIT =====
+showScreen('login');
+</script>
+</body>
+</html>
