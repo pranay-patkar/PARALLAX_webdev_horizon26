@@ -220,7 +220,7 @@ function initDashboard(){
   alertLog=[];activeScenario='normal';
   renderDashboard();initCharts();startClock();
   if(liveInterval)clearInterval(liveInterval);
-  liveInterval=setInterval(liveUpdate,3000);
+  initSupabase();
 }
 // ===== RENDER =====
 function renderDashboard(){
