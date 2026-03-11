@@ -111,14 +111,17 @@ function quickLogin(role){
   handleLogin();
 }
 function signOut(){
-  supabaseSignOut(); return;
+  if(typeof supabaseSignOut === 'function' && _supabase){
+    supabaseSignOut(); return;
+  }
   currentUser=null;currentRole=null;
   if(liveInterval)clearInterval(liveInterval);liveInterval=null;
   delivChart=null;radarChart=null;stackedChart=null;
   liveData={stock:65,delivery:8,orders:120,cancel:8,revenue:62};
   delivHistory=[];alertLog=[];orderPeak=0;activeScenario='normal';
   document.getElementById('userDropdown').classList.remove('open');
-  document.getElementById('loginInput').value='';document.getElementById('loginPassword').value='';
+  document.getElementById('loginInput').value='';
+  document.getElementById('loginPassword').value='';
   hideError('loginError');showScreen('login');
 }
 const SCENARIOS={
