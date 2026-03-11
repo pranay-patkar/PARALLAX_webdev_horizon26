@@ -93,7 +93,7 @@ function handleRealtimePacket(metrics) {
 
 function applyMetrics(m) {
   realtimeActive = true;
-  setTimeout(() => realtimeActive = false, 8000);
+  setTimeout(() => realtimeActive = false, 4000);
   liveData.stock    = Number(m.stock)    || liveData.stock;
   liveData.orders   = Number(m.orders)   || liveData.orders;
   liveData.revenue  = Number(m.revenue)  || liveData.revenue;
