@@ -1,4 +1,3 @@
-let realtimeActive = false;
 const SUPABASE_URL      = 'https://jvvljfvjsqkdkoycjcrb.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2dmxqZnZqc3FrZGtveWNqY3JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxODQwNjcsImV4cCI6MjA4ODc2MDA2N30.2WgUnO7k1YdJBl4Cd2rEwzgi3ZpHOuzeyfRPn2UDpB0
 ';
@@ -92,8 +91,6 @@ function handleRealtimePacket(metrics) {
 }
 
 function applyMetrics(m) {
-  realtimeActive = true;
-  setTimeout(() => realtimeActive = false, 4000);
   liveData.stock    = Number(m.stock)    || liveData.stock;
   liveData.orders   = Number(m.orders)   || liveData.orders;
   liveData.revenue  = Number(m.revenue)  || liveData.revenue;
