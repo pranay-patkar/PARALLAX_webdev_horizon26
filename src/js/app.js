@@ -320,13 +320,31 @@ function openWarRoom(label){
 function closeWarRoom(){document.getElementById('warRoom').classList.remove('open');}
 function nudge(v,r,mn,mx){return Math.min(mx,Math.max(mn,v+(Math.random()-0.45)*r));}
 function liveUpdate(){
-  liveData.stock=Math.round(nudge(liveData.stock,3,0,100));
-  liveData.delivery=parseFloat(nudge(liveData.delivery,1,5,40).toFixed(1));
-  liveData.orders=Math.round(nudge(liveData.orders,12,5,200));
-  liveData.cancel=Math.round(nudge(liveData.cancel,2,0,60));
-  liveData.revenue=parseFloat(Math.min(100,liveData.revenue+Math.random()*0.8).toFixed(1));
+  liveData.stock=Math.round(nudge(liveData.stock,4,0,100));
+  liveData.delivery=parseFloat(nudge(liveData.delivery,2,5,40).toFixed(1));
+  liveData.orders=Math.round(nudge(liveData.orders,15,5,200));
+  liveData.cancel=Math.round(nudge(liveData.cancel,3,0,60));
+  liveData.revenue=parseFloat(Math.min(100,liveData.revenue+Math.random()*1.2).toFixed(1));
   delivHistory.push(liveData.delivery);if(delivHistory.length>14)delivHistory.shift();
   if(liveData.orders>orderPeak)orderPeak=liveData.orders;
+  if(delivChart){
+    delivChart.data.datasets[0].data=[...delivHistory];
+    delivChart.update();
+  }
+  if(radarChart){
+    const c=liveData.cancel;
+    radarChart.data.datasets[0].data=[clamp(c*1.2+10),clamp(c*0.8+5),clamp(c*0.4),clamp(c*0.6+8),clamp(c*1.1+3),clamp(c*0.9+7)];
+    radarChart.update();
+  }
+  if(stackedChart){
+    const ot=Math.round(40+Math.random()*25);
+    const dl=Math.round(Math.max(2,liveData.delivery-5+Math.random()*5));
+    stackedChart.data.datasets[0].data.shift();
+    stackedChart.data.datasets[0].data.push(ot);
+    stackedChart.data.datasets[1].data.shift();
+    stackedChart.data.datasets[1].data.push(dl);
+    stackedChart.update();
+  }
   renderDashboard();
 }
 function startClock(){
