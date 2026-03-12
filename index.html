@@ -1,182 +1,186 @@
-
-<! html>
-<html lang="en" data-theme="light">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>OpsPulse — Quick Commerce Intelligence</title>
-<meta name="description" content="OpsPulse: Real-time quick commerce business health dashboard."/>
-<meta name="theme-color" content="#1B2B4B"/>
-<link rel="icon" type="image/svg+xml" href="public/favicon.svg"/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link rel="stylesheet" href="src/css/main.css"/>
-</head>
-<body>
-<!-- ===== LOGIN ===== -->
-<div id="loginScreen" class="auth-screen" style="display:block">
-<div class="auth-split">
-  <div class="auth-brand">
-    <div class="auth-brand-content">
-      <div class="brand-logo">Ops<span>Pulse</span></div>
-      <div class="brand-edition">Business Health Dashboard</div>
-      <div class="brand-tagline">Quick Commerce Intelligence Platform</div>
-      <ul class="brand-features">
-        <li class="brand-feature"><span class="arrow">→</span> Real-time business health monitoring</li>
-        <li class="brand-feature"><span class="arrow">→</span> Intelligent crisis detection</li>
-        <li class="brand-feature"><span class="arrow">→</span> Role-based operational views</li>
-      </ul>
-    </div>
-    <div class="brand-trust">Trusted by quick commerce operators across India</div>
-  </div>
-  <div class="auth-form-panel">
-    <div class="auth-card">
-      <h2>Sign in to OpsPulse</h2>
-      <div class="auth-sub">Enter your credentials to access your dashboard</div>
-      <div class="auth-divider"></div>
-      <div class="role-seg">
-        <button class="role-seg-btn active-owner" id="roleOwnerBtn" onclick="selectLoginRole('owner')">👔 Owner</button>
-        <button class="role-seg-btn" id="roleManagerBtn" onclick="selectLoginRole('manager')">⚙️ Manager</button>
-      </div>
-      <div class="form-group"><label class="form-label">Email address or phone number</label><input id="loginInput" class="form-input" type="text" placeholder="you@company.com"/></div>
-      <div class="form-group"><label class="form-label">Password</label><div class="pw-wrapper"><input id="loginPassword" class="form-input" type="password" placeholder="Enter your password"/><button class="pw-toggle" onclick="togglePw('loginPassword',this)">👁</button></div></div>
-      <button class="btn-primary full" onclick="handleLogin()">Sign In</button>
-      <div id="loginError" class="auth-error"></div>
-      <div class="auth-footer"><span onclick="alert('Password reset not available in demo mode.')">Forgot password?</span><span onclick="showScreen('signup')">Create account →</span></div>
-      <div class="demo-box">
-        <div class="demo-box-title">Demo Credentials</div>
-        <div class="demo-creds">
-          <div class="demo-cred-row"><span>👔 Owner email</span><span class="demo-cred-val"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e18e968f8493a18e919291948d9284cf828e8c">[email&#160;protected]</a></span></div>
-          <div class="demo-cred-row"><span>👔 Password</span><span class="demo-cred-val">owner123</span></div>
-          <div class="demo-cred-row" style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px"><span>⚙️ Manager email</span><span class="demo-cred-val"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bad7dbd4dbdddfc8fad5cac9cacfd6c9df94d9d5d7">[email&#160;protected]</a></span></div>
-          <div class="demo-cred-row"><span>⚙️ Password</span><span class="demo-cred-val">ops2024</span></div>
-        </div>
-        <div class="quick-login-row">
-          <button class="btn-quick btn-quick-owner" onclick="quickLogin('owner')">👔 Login as Owner</button>
-          <button class="btn-quick btn-quick-manager" onclick="quickLogin('manager')">⚙️ Login as Manager</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-<div id="signupScreen" class="auth-screen">
-<div class="auth-split">
-  <div class="auth-brand">
-    <div class="auth-brand-content">
-      <div class="brand-logo">Ops<span>Pulse</span></div>
-      <div class="brand-edition">Business Health Dashboard</div>
-      <div class="brand-tagline">Quick Commerce Intelligence Platform</div>
-      <ul class="brand-features">
-        <li class="brand-feature"><span class="arrow">→</span> Real-time business health monitoring</li>
-        <li class="brand-feature"><span class="arrow">→</span> Intelligent crisis detection</li>
-        <li class="brand-feature"><span class="arrow">→</span> Role-based operational views</li>
-      </ul>
-    </div>
-    <div class="brand-trust">Trusted by quick commerce operators across India</div>
-  </div>
-  <div class="auth-form-panel">
-    <div class="auth-card signup">
-      <div class="progress-wrap"><div class="progress-track"><div class="progress-fill" id="progressFill" style="width:50%"></div></div><div class="progress-label" id="progressLabel">Step 1 of 2 — Personal Information</div></div>
-      <div id="signupStep1" style="display:block">
-        <h2>Create your account</h2>
-        <div class="auth-sub">Join OpsPulse to monitor your business in real time</div>
-        <div class="auth-divider"></div>
-        <div class="form-group"><label class="form-label">Full Name *</label><input id="suName" class="form-input" placeholder="Arjun Mehta"/><div class="field-error" id="err-suName"></div></div>
-        <div class="form-group"><label class="form-label">Email Address *</label><input id="suEmail" class="form-input" type="email" placeholder="arjun@business.com"/><div class="field-error" id="err-suEmail"></div></div>
-        <div class="form-group"><label class="form-label">Phone Number *</label><input id="suPhone" class="form-input" placeholder="+91 98765 43210"/><div class="field-error" id="err-suPhone"></div></div>
-        <div class="form-group"><label class="form-label">Password *</label><div class="pw-wrapper"><input id="suPassword" class="form-input" type="password" placeholder="Min. 8 characters"/><button class="pw-toggle" onclick="togglePw('suPassword',this)">👁</button></div><div class="field-error" id="err-suPassword"></div></div>
-        <div class="form-group"><label class="form-label">Confirm Password *</label><input id="suConfirm" class="form-input" type="password" placeholder="Repeat your password"/><div class="field-error" id="err-suConfirm"></div></div>
-        <button class="btn-primary full" onclick="signupNext()">Continue →</button>
-        <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--text-muted)">Already have an account? <span style="color:var(--blue);cursor:pointer;font-weight:500" onclick="showScreen('login')">Sign in</span></div>
-      </div>
-      <div id="signupStep2" style="display:none">
-        <h2>Business details</h2>
-        <div class="auth-sub">Tell us about your business to configure your dashboard</div>
-        <div class="auth-divider"></div>
-        <div class="form-group"><label class="form-label">Business Name *</label><input id="suBusiness" class="form-input" placeholder="SwiftBasket Pvt. Ltd."/><div class="field-error" id="err-suBusiness"></div></div>
-        <div class="form-group"><label class="form-label">City / Location *</label><input id="suCity" class="form-input" placeholder="Mumbai"/><div class="field-error" id="err-suCity"></div></div>
-        <div class="form-row"><div class="form-group"><label class="form-label">Business Size *</label><select id="suSize" class="form-input"><option value="">Select size</option><option>Solo (Just me)</option><option>Small (2–10 staff)</option><option>Medium (10–50 staff)</option><option>Large (50+ staff)</option></select></div><div class="form-group"><label class="form-label">Category *</label><select id="suCategory" class="form-input"><option value="">Select category</option><option>Grocery & Essentials</option><option>Pharmacy & Health</option><option>Electronics & Gadgets</option><option>Fashion & Apparel</option><option>Food & Beverages</option><option>Home & Kitchen</option></select></div></div>
-        <div class="form-row"><div class="form-group"><label class="form-label">Delivery Zones</label><input id="suZones" class="form-input" type="number" placeholder="e.g. 5" min="1" max="50"/></div><div class="form-group"><label class="form-label">Warehouses</label><input id="suWarehouses" class="form-input" type="number" placeholder="e.g. 3" min="1" max="20"/></div></div>
-        <div class="form-group"><label class="form-label">Daily Order Target</label><input id="suOrderTarget" class="form-input" type="number" placeholder="e.g. 500 orders/day"/><div class="form-note">Used to calibrate your dashboard KPIs</div></div>
-        <div class="form-group"><label class="form-label">Operating Hours</label><div class="hours-row"><select id="suHoursOpen" class="form-input"></select><span class="hours-sep">to</span><select id="suHoursClose" class="form-input"></select></div></div>
-        <div class="form-group"><label class="form-label">Your Role *</label>
-          <div class="role-cards"><div class="role-card" onclick="selectRole(this,'owner')"><div class="rc-icon">👔</div><div class="rc-title">Business Owner</div><div class="rc-desc">Full financial and growth view — revenue, MRR, stress score</div></div><div class="role-card" onclick="selectRole(this,'manager')"><div class="rc-icon">⚙️</div><div class="rc-title">Operations Manager</div><div class="rc-desc">Inventory, ops, delivery focus — stock levels, ticket queue</div></div></div>
-          <div class="field-error" id="err-suRole"></div>
-        </div>
-        <div class="step-actions"><span class="btn-ghost" onclick="signupBack()">← Back</span><button class="btn-primary" onclick="handleSignup()">Create Account</button></div>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-
 <!-- ===== DASHBOARD ===== -->
 <div id="dashboardScreen" class="dashboard-shell">
+
+  <!-- Top Nav -->
   <nav class="topnav">
-    <div class="topnav-logo"><span class="logo-dot"></span>OpsPulse</div>
+    <div class="topnav-logo">Ops<span style="color:var(--orange)">Pulse</span><span class="logo-dot"></span></div>
     <div class="topnav-sep"></div>
+    <div class="topnav-links">
+      <span class="topnav-link active">Dashboard</span>
+    </div>
     <div class="topnav-right">
-      <div class="theme-toggle"><span class="toggle-label active" id="lightLabel">Light</span><div class="toggle-track" onclick="toggleTheme()"><div class="toggle-thumb" id="toggleThumb"></div></div><span class="toggle-label" id="darkLabel">Dark</span></div>
-      <div class="user-menu-wrap"><div class="user-avatar" id="navAvatar" onclick="document.getElementById('userDropdown').classList.toggle('open')"></div><div class="user-dropdown" id="userDropdown"><div class="ud-header"><div class="ud-avatar" id="udAvatar"></div><div class="ud-info"><div class="ud-name" id="udName"></div><div class="ud-meta" id="udMeta"></div></div></div><div class="ud-actions"><button class="ud-action danger" onclick="signOut()">Sign Out</button></div></div></div>
+
+      <!-- Simulate Dropdown -->
+      <div style="position:relative;display:inline-block">
+        <button onclick="document.getElementById('simDropdown').classList.toggle('open')" style="background:#1e3a5f;color:#fff;border:1px solid #2d4f7c;padding:5px 14px;border-radius:6px;font-size:11px;cursor:pointer;font-family:'IBM Plex Mono',monospace;letter-spacing:0.5px">⚡ Simulate ▾</button>
+        <div id="simDropdown" style="display:none;position:absolute;top:36px;right:0;background:#1a2535;border:1px solid #2d4f7c;border-radius:8px;min-width:210px;z-index:9999;padding:6px 0">
+          <div onclick="loadScenario('normal');document.getElementById('simDropdown').classList.remove('open')" style="padding:10px 16px;cursor:pointer;font-size:12px;color:#94a3b8;font-family:'Plus Jakarta Sans',sans-serif" onmouseover="this.style.background='#243044'" onmouseout="this.style.background=''">✅ Normal Operations</div>
+          <div onclick="loadScenario('opportunity');document.getElementById('simDropdown').classList.remove('open')" style="padding:10px 16px;cursor:pointer;font-size:12px;color:#4ade80;font-family:'Plus Jakarta Sans',sans-serif" onmouseover="this.style.background='#243044'" onmouseout="this.style.background=''">🟢 Peak Opportunity</div>
+          <div onclick="loadScenario('rushhour');document.getElementById('simDropdown').classList.remove('open')" style="padding:10px 16px;cursor:pointer;font-size:12px;color:#38bdf8;font-family:'Plus Jakarta Sans',sans-serif" onmouseover="this.style.background='#243044'" onmouseout="this.style.background=''">⚡ Rush Hour Surge</div>
+          <div onclick="loadScenario('anomaly');document.getElementById('simDropdown').classList.remove('open')" style="padding:10px 16px;cursor:pointer;font-size:12px;color:#f59e0b;font-family:'Plus Jakarta Sans',sans-serif" onmouseover="this.style.background='#243044'" onmouseout="this.style.background=''">🟡 Anomaly Detected</div>
+          <div style="border-top:1px solid #2d4f7c;margin:4px 0"></div>
+          <div onclick="loadScenario('delivery');document.getElementById('simDropdown').classList.remove('open')" style="padding:10px 16px;cursor:pointer;font-size:12px;color:#f87171;font-family:'Plus Jakarta Sans',sans-serif" onmouseover="this.style.background='#243044'" onmouseout="this.style.background=''">🚨 Crisis — War Room</div>
+          <div style="border-top:1px solid #2d4f7c;margin:4px 0"></div>
+          <div onclick="toggleDemo();document.getElementById('simDropdown').classList.remove('open')" style="padding:10px 16px;cursor:pointer;font-size:12px;color:#a78bfa;font-family:'Plus Jakarta Sans',sans-serif" onmouseover="this.style.background='#243044'" onmouseout="this.style.background=''">🎬 <span id="demoBtnLabel">Auto Demo Mode</span></div>
+        </div>
+      </div>
+
+      <!-- Theme Toggle -->
+      <div class="theme-toggle">
+        <span class="toggle-label active" id="lightLabel">Light</span>
+        <div class="toggle-track" onclick="toggleTheme()">
+          <div class="toggle-thumb" id="toggleThumb"></div>
+        </div>
+        <span class="toggle-label" id="darkLabel">Dark</span>
+      </div>
+
+      <!-- User Menu -->
+      <div class="user-menu-wrap">
+        <div class="user-avatar" id="navAvatar" onclick="document.getElementById('userDropdown').classList.toggle('open')">OP</div>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="ud-header">
+            <div class="ud-avatar" id="udAvatar">OP</div>
+            <div class="ud-info">
+              <div class="ud-name" id="udName">User</div>
+              <div class="ud-meta" id="udMeta"></div>
+            </div>
+          </div>
+          <div class="ud-actions">
+            <button class="ud-action danger" onclick="signOut()">Sign Out</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </nav>
-  <!-- TICKER BAR -->
+
+  <!-- Ticker Bar -->
   <div class="ticker-bar">
-    <div class="ticker-label">Live Alerts</div>
-    <div class="ticker-feed" id="tickerFeed">
-      <div class="ticker-item"><span class="ti-badge ok">OK</span> All systems nominal — monitoring active</div>
-    </div>
+    <div class="ticker-label">LIVE</div>
+    <div class="ticker-feed" id="tickerFeed"></div>
     <div class="ticker-right">
-      <div class="live-dot"></div>
-      <span id="tickerClock">--:--:-- --</span>
+      <span class="live-dot"></span>
+      <span id="tickerClock" class="mono">--:--:--</span>
     </div>
   </div>
-  <div class="breadcrumb-bar" id="breadcrumb">Console Home <span>›</span> Dashboard <span>›</span> <span class="bc-current">Business Health</span></div>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb-bar">
+    Console Home <span>›</span> Dashboard <span>›</span> <span class="bc-current">Business Health</span>
+  </div>
+
+  <!-- Main Content -->
   <div class="main-scroll">
     <div class="main-inner">
-      <div class="page-header"><div><div class="ph-title" id="pageTitle"></div><div class="ph-subtitle" id="pageSubtitle"></div></div><div class="ph-right"><div class="ph-updated" id="pageUpdated"></div></div></div>
-      <div id="alertBanner" class="alert-banner"></div>
-      <div id="stressCard" class="card stress-card"><div class="card-header"><div><div class="card-title">Business Stress Score</div></div><div class="ph-updated" id="stressTime"></div></div><div class="stress-body"><div class="stress-left"><div class="stress-score" id="scoreNumber">0</div><div class="stress-status" id="scoreStatus">Healthy</div></div><div class="stress-bars" id="stressBars"></div></div></div>
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <div class="ph-title" id="pageTitle">Business Overview</div>
+          <div class="ph-subtitle" id="pageSubtitle">Loading...</div>
+        </div>
+        <div class="ph-right">
+          <span class="ph-updated mono" id="pageUpdated">Last updated: --:--:--</span>
+        </div>
+      </div>
+
+      <!-- Alert Banner -->
+      <div class="alert-banner" id="alertBanner"></div>
+
+      <!-- Stress Score (both roles) -->
+      <div class="card stress-card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Business Stress Score</div>
+          </div>
+          <span class="mono" style="font-size:12px;color:var(--text-faint)" id="stressTime">--:--:-- --</span>
+        </div>
+        <div class="stress-body">
+          <div class="stress-left">
+            <div class="stress-score mono" id="scoreNumber">--</div>
+            <div class="stress-status" id="scoreStatus">Loading</div>
+          </div>
+          <div class="stress-bars" id="stressBars"></div>
+        </div>
+      </div>
+
+      <!-- KPI Row (both roles) -->
       <div class="kpi-row" id="kpiRow"></div>
-      <!-- OWNER ONLY -->
-      <div id="ownerView" style="display:none">
-        <div class="dash-grid two-col" style="margin-bottom:16px"><div class="card"><div class="card-header"><div><div class="card-title">Delivery Time Trend</div><div class="card-subtitle">Rolling 14-point average</div></div></div><div class="chart-wrap"><canvas id="chartDelivery"></canvas></div></div><div class="card"><div class="card-header"><div><div class="card-title">Cancellation Radar</div><div class="card-subtitle">By category — this week vs last</div></div></div><div class="chart-wrap"><canvas id="chartRadar"></canvas></div></div></div>
-        <div class="card" style="margin-bottom:16px"><div class="card-header"><div><div class="card-title">Live Performance Meters</div></div><span class="btn-ghost">View details →</span></div><div class="speedo-row"><div class="speedo-wrap" id="speedoOrders"></div><div class="speedo-wrap" id="speedoRevenue"></div></div></div>
+
+      <!-- Owner View -->
+      <div id="ownerView">
+        <div class="dash-grid two-col">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Delivery Time Trend</div>
+              <span style="font-size:11px;color:var(--text-muted)">Last 14 updates</span>
+            </div>
+            <div class="chart-wrap"><canvas id="chartDelivery"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Cancellation Radar</div>
+              <span style="font-size:11px;color:var(--text-muted)">By reason</span>
+            </div>
+            <div class="chart-wrap"><canvas id="chartRadar"></canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Live Performance</div>
+            <span style="font-size:11px;color:var(--text-muted)">Real-time gauges</span>
+          </div>
+          <div class="speedo-row">
+            <div class="speedo-wrap" id="speedoOrders"></div>
+            <div class="speedo-wrap" id="speedoRevenue"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <div class="card-header">
+            <div class="card-title">Alert Log</div>
+            <span class="badge badge-healthy" style="font-size:10px">Auto-clears</span>
+          </div>
+          <div class="alert-table" id="alertTable">
+            <div style="padding:20px;text-align:center;color:var(--text-faint);font-size:13px">No alerts — all systems healthy</div>
+          </div>
+        </div>
       </div>
-      <!-- MANAGER ONLY -->
+
+      <!-- Manager View -->
       <div id="managerView" style="display:none">
-        <div class="dash-grid two-col-m" style="margin-bottom:16px">
-          <div class="card"><div class="card-header"><div><div class="card-title">Stock Levels by Category</div></div></div><div class="inv-list" id="inventoryList"></div></div>
-          <div class="card"><div class="card-header"><div><div class="card-title">Delivery Performance (Last 8h)</div></div></div><div class="chart-wrap"><canvas id="chartStacked"></canvas></div></div>
+        <div class="dash-grid two-col-m">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Stock Levels by Category</div>
+              <span style="font-size:11px;color:var(--text-muted)">Live inventory</span>
+            </div>
+            <div class="inv-list" id="inventoryList"></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Delivery Performance</div>
+              <span style="font-size:11px;color:var(--text-muted)">Last 8h</span>
+            </div>
+            <div class="chart-wrap"><canvas id="chartStacked"></canvas></div>
+          </div>
         </div>
         <div class="card" style="margin-bottom:16px">
-          <div class="card-header"><div><div class="card-title">Operational Action Items</div></div></div>
-          <div id="actionTable" style="padding:4px 0"></div>
+          <div class="card-header">
+            <div class="card-title">Operational Action Items</div>
+          </div>
+          <div id="actionTable"></div>
         </div>
-        <div class="card" style="margin-bottom:16px">
-          <div class="card-header"><div style="display:flex;align-items:center;gap:8px"><span>🔔</span><div class="card-title">Live Alerts Log</div></div><span style="font-size:11px;background:var(--border);color:var(--text-muted);padding:3px 10px;border-radius:4px">Auto-clears</span></div>
-          <div class="alert-table" id="alertTableManager"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Live Alerts Log</div>
+            <span class="badge badge-healthy" style="font-size:10px">Auto-clears</span>
+          </div>
+          <div class="alert-table" id="alertTableManager">
+            <div style="padding:20px;text-align:center;color:var(--text-faint);font-size:13px;font-style:italic">Waiting for events...</div>
+          </div>
         </div>
       </div>
-      <!-- ALERTS (both) -->
-      <div class="card" style="margin-bottom:20px"><div class="card-header"><div><div class="card-title">Live Alerts</div></div><span class="btn-ghost">View all alerts →</span></div><div class="alert-table" id="alertTable"></div></div>
+
     </div>
   </div>
 </div>
-
-<!-- WAR ROOM -->
-<div id="warRoom" class="warroom"><div class="warroom-nav"><div class="warroom-nav-left"><span class="wr-logo">🔴 OpsPulse</span><span class="wr-label">INCIDENT RESPONSE ACTIVE</span></div><button class="btn-danger" onclick="closeWarRoom()">Exit War Room ✕</button></div><div class="warroom-body"><div class="warroom-inner"><div class="wr-left"><div class="wr-tag">ACTIVE INCIDENT</div><div class="wr-title" id="wrTitle">⚠ WAR ROOM ⚠</div><div class="wr-desc" id="wrDesc"></div><div class="wr-time" id="wrTime"></div><div class="wr-actions" id="wrActions"></div></div><div class="wr-right"><div class="wr-metrics-title">Current Critical Metrics</div><div id="wrMetrics"></div></div></div></div></div>
-
-<!-- TOAST -->
-<div id="toast" class="toast"></div>
-
-<!-- App Script -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="src/js/supabase-integration.js"></script>
-<script src="src/js/demo-mode.js"></script>
-<script src="src/js/app.js"></script>
-</body>
-</html>
