@@ -2,7 +2,7 @@
 const userDB = {
   "owner@opspulse.com":{password:"owner123",phone:"9876543210",role:"owner",name:"Arjun Mehta",business:"SwiftBasket",city:"Mumbai",size:"Medium",zones:"5",orderTarget:"200",hours:"6am-midnight",category:"Grocery",warehouses:"3",avatar:"AM"},
   "manager@opspulse.com":{password:"ops2024",phone:"9123456780",role:"manager",name:"Priya Sharma",business:"SwiftBasket",city:"Mumbai",size:"Medium",zones:"5",orderTarget:"200",hours:"6am-midnight",category:"Grocery",warehouses:"3",avatar:"PS"}
-};
+};af
 let currentScreen='login',currentUser=null,currentRole=null,signupRole='';
 let selectedLoginRole='owner';
 let liveData={stock:65,delivery:8,orders:120,cancel:8,revenue:62};
@@ -60,7 +60,7 @@ function initSignupHours(){
   const hrs=['12am','1am','2am','3am','4am','5am','6am','7am','8am','9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm','10pm','11pm'];
   ['suHoursOpen','suHoursClose'].forEach(id=>{const s=document.getElementById(id);if(s.options.length>1)return;s.innerHTML='';hrs.forEach(h=>{const o=document.createElement('option');o.value=h;o.textContent=h;s.appendChild(o);});});
   document.getElementById('suHoursOpen').value='6am';document.getElementById('suHoursClose').value='12am';
-}
+} 
 function selectRole(el,role){document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');signupRole=role;}
 function signupNext(){
   clearFieldErrors();let v=true;
@@ -158,14 +158,7 @@ function calcStressScore(d){
   const cancelS=Math.max(0,100-d.cancel*1.5);
   return{stockS:Math.round(stockS),delivS:Math.round(delivS),orderS:Math.round(orderS),cancelS:Math.round(cancelS),total:Math.round(stockS*0.35+delivS*0.30+orderS*0.25+cancelS*0.10)};
 }
-function updateCrisisScore(score){
-  const badge=document.getElementById('crisisBadge'),val=document.getElementById('crisisVal'),msg=document.getElementById('crisisMsg');
-  const cv=100-score.total;val.textContent=cv;
-  if(cv>=60){badge.classList.add('show','pulse');msg.textContent='CRITICAL - Action required';
-    if(!crisisAlertShown&&currentScreen==='dashboard'){crisisAlertShown=true;addAlert('crisis','Crisis score '+cv+' - systems in distress');}
-  }else if(cv>=40){badge.classList.add('show');badge.classList.remove('pulse');msg.textContent='Elevated risk';crisisAlertShown=false;}
-  else{badge.classList.remove('show','pulse');crisisAlertShown=false;}
-}
+
 function initDashboard(){
   document.getElementById('navAvatar').textContent=currentUser.avatar;
   document.getElementById('udAvatar').textContent=currentUser.avatar;
@@ -232,11 +225,12 @@ function renderDashboard(){
   }
   updateAlertBanner(d,score);
   renderAlerts();
-  updateCrisisScore(score);
   updateTicker(d,score);
   if(score.total<40&&!document.getElementById('warRoom').classList.contains('open'))setTimeout(()=>openWarRoom('Score Critical: '+score.total),600);
+  if(score.total>=45&&document.getElementById('warRoom').classList.contains('open'))closeWarRoom();
   updateCharts();
 }
+
 function genActions(d){
   const a=[];
   if(d.stock<15)a.push({level:'HIGH',text:'Reorder stock - avg at '+d.stock+'%'});
