@@ -2,7 +2,7 @@
 const userDB = {
   "owner@opspulse.com":{password:"owner123",phone:"9876543210",role:"owner",name:"Arjun Mehta",business:"SwiftBasket",city:"Mumbai",size:"Medium",zones:"5",orderTarget:"200",hours:"6am-midnight",category:"Grocery",warehouses:"3",avatar:"AM"},
   "manager@opspulse.com":{password:"ops2024",phone:"9123456780",role:"manager",name:"Priya Sharma",business:"SwiftBasket",city:"Mumbai",size:"Medium",zones:"5",orderTarget:"200",hours:"6am-midnight",category:"Grocery",warehouses:"3",avatar:"PS"}
-};af
+};
 let currentScreen='login',currentUser=null,currentRole=null,signupRole='';
 let selectedLoginRole='owner';
 let liveData={stock:65,delivery:8,orders:120,cancel:8,revenue:62};
