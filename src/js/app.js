@@ -253,7 +253,7 @@ function initDashboard(){
   if(liveInterval)clearInterval(liveInterval);
   try{initSupabase();}catch(e){console.warn('Supabase skipped',e);}
   liveInterval=setInterval(liveUpdate,3000);
-  setTimeout(loadReviews, 4000);
+  loadReviews();
 
   // Init map after short delay to let DOM settle
   if(currentRole==='manager')setTimeout(()=>initRiderMap(),400);
@@ -459,6 +459,7 @@ function closeAlertModal(){
 // ===== REVIEWS =====
 async function loadReviews(){
   if(currentRole!=='owner')return;
+  await new Promise(r=>setTimeout(r,3000));
   const sb=window._supabase||_supabase;
   if(!sb){renderReviews(getMockReviews());return;}
   const {data,error}=await sb
