@@ -459,27 +459,7 @@ function closeAlertModal(){
 // ===== REVIEWS =====
 async function loadReviews(){
   if(currentRole!=='owner')return;
-  await new Promise(r=>setTimeout(r,3000));
-  const sb=window._supabase||_supabase;
-  if(!sb){renderReviews(getMockReviews());return;}
-  const {data,error}=await sb
-    .from('customer_reviews')
-    .select('*')
-    .order('created_at',{ascending:false})
-    .limit(10);
-  if(error){console.log('Review error:',error);renderReviews(getMockReviews());return;}
-  if(!data||!data.length){renderReviews(getMockReviews());return;}
-  renderReviews(data.map(formatReview));
-  sb.channel('reviews-live')
-    .on('postgres_changes',
-      {event:'INSERT',schema:'public',table:'customer_reviews'},
-      ()=>{
-        sb.from('customer_reviews').select('*')
-          .order('created_at',{ascending:false}).limit(10)
-          .then(({data})=>{if(data&&data.length)renderReviews(data.map(formatReview));});
-        showToast('New WhatsApp review received!');
-      }
-    ).subscribe();
+  renderReviews(getMockReviews());
 }
 
 function getMockReviews(){
