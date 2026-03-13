@@ -7,6 +7,7 @@ let _realtimeChannel = null;
 
 async function initSupabase() {
   _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  window._supabase = _supabase;
   await loadLatestMetrics();
   startRealtimeListener();
 }
