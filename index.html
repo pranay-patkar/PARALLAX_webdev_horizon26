@@ -182,7 +182,7 @@
       <!-- OWNER ONLY -->
       <div id="ownerView" style="display:none">
         <div class="dash-grid two-col" style="margin-bottom:16px"><div class="card"><div class="card-header"><div><div class="card-title">Delivery Time Trend</div><div class="card-subtitle">Rolling 14-point average</div></div></div><div class="chart-wrap"><canvas id="chartDelivery"></canvas></div></div><div class="card"><div class="card-header"><div><div class="card-title">Cancellation Radar</div><div class="card-subtitle">By category — this week vs last</div></div></div><div class="chart-wrap"><canvas id="chartRadar"></canvas></div></div></div>
-        <div class="card" style="margin-bottom:16px"><div class="card-header"><div><div class="card-title">Live Performance Meters</div></div><span class="btn-ghost">View details →</span></div><div class="speedo-row"><div class="speedo-wrap" id="speedoOrders"></div><div class="speedo-wrap" id="speedoRevenue"></div></div></div>
+        <div class="card" style="margin-bottom:16px"><div class="card-header"><div><div class="card-title">Live Performance Meters</div></div></div><span class="btn-ghost" onclick="document.getElementById('speedoOrders').scrollIntoView({behavior:'smooth'})">View details →</span><div class="speedo-row"><div class="speedo-wrap" id="speedoOrders"></div><div class="speedo-wrap" id="speedoRevenue"></div></div></div>
       </div>
 
       <!-- MANAGER ONLY -->
@@ -202,7 +202,7 @@
       </div>
 
       <!-- ALERTS (both roles) -->
-      <div class="card" style="margin-bottom:20px"><div class="card-header"><div><div class="card-title">Live Alerts</div></div><span class="btn-ghost">View all alerts →</span></div><div class="alert-table" id="alertTable"></div></div>
+      <div class="card" style="margin-bottom:20px"><div class="card-header"><div><div class="card-title">Live Alerts</div></div><span class="btn-ghost" onclick="document.getElementById('alertTable').scrollIntoView({behavior:'smooth'})">View all alerts →</span></div><div class="alert-table" id="alertTable"></div></div>
     </div>
   </div>
 </div>
