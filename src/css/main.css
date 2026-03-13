@@ -275,3 +275,16 @@ select.form-input{appearance:none;cursor:pointer;padding-right:32px;background-i
 .crisis-badge .cb-val{font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:700;color:var(--red)}
 .crisis-badge .cb-msg{font-size:10px;color:var(--text-muted);margin-top:4px;text-align:center}
 @keyframes crisisPulse{0%,100%{border-color:var(--red);box-shadow:0 0 0 0 rgba(220,38,38,0.3)}50%{border-color:#ff6b6b;box-shadow:0 0 0 6px rgba(220,38,38,0)}}
+.ti-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+.ti-badge.ok   { background: rgba(22,163,74,0.15);  color: #16a34a; }
+.ti-badge.warn { background: rgba(217,119,6,0.15);  color: #d97706; }
+.ti-badge.crit { background: rgba(220,38,38,0.15);  color: #dc2626; }
