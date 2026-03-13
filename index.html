@@ -17,7 +17,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link rel="stylesheet" href="src/css/main.css"/>
 <style>
-/*  ===== WHATSAPP SETTINGS CARD ===== */
+/* ===== WHATSAPP SETTINGS CARD ===== */
 .wa-settings-card .card-header{align-items:flex-start}
 .wa-settings-body{padding:0 20px 20px}
 .wa-fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
@@ -202,7 +202,7 @@
       </div>
 
       <!-- ALERTS (both roles) -->
-      <div class="card" style="margin-bottom:20px"><div class="card-header"><div><div class="card-title">Live Alerts</div></div><span class="btn-ghost" onclick="document.getElementById('alertTable').scrollIntoView({behavior:'smooth'})">View all alerts →</span></div><div class="alert-table" id="alertTable"></div></div>
+      <div class="card" style="margin-bottom:20px"><div class="card-header"><div><div class="card-title">Live Alerts</div></div><span class="btn-ghost" onclick="openAlertModal()">View all alerts →</span></div><div class="alert-table" id="alertTable"></div></div>
     </div>
   </div>
 </div>
@@ -231,4 +231,12 @@
 <script src="src/js/demo-mode.js"></script>
 <script src="src/js/app.js"></script>
 </body>
-</html>
+</html><div id="alertModal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px)" onclick="if(event.target===this)closeAlertModal()">
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(600px,90vw);max-height:80vh;overflow-y:auto;background:var(--card-bg);border-radius:8px;border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,0.4)">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--card-bg)">
+      <div style="font-weight:700;font-size:16px;font-family:'Playfair Display',serif">🔔 Alert History</div>
+      <button class="btn-ghost" onclick="closeAlertModal()">✕ Close</button>
+    </div>
+    <div id="alertModalBody" style="padding:8px 0"></div>
+  </div>
+</div>
