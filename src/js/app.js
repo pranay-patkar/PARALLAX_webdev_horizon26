@@ -233,12 +233,6 @@ function initDashboard(){
 
   // Inject rider map card into manager view
   if(currentRole==='manager'){
-    const mv=document.getElementById('managerView');
-    if(mv&&!document.getElementById('riderMapCard')){
-      const div=document.createElement('div');div.id='riderMapCardWrap';
-      div.innerHTML=renderRiderMapCard();
-      mv.insertBefore(div,mv.firstChild);
-    }
     // Inject WA settings for manager too
     if(mv&&!document.getElementById('waSettingsInManager')){
       const div=document.createElement('div');div.id='waSettingsInManager';
@@ -253,8 +247,7 @@ function initDashboard(){
   if(liveInterval)clearInterval(liveInterval);
   try{initSupabase();}catch(e){console.warn('Supabase skipped',e);}
   liveInterval=setInterval(liveUpdate,3000);
-  loadReviews();
-
+  if(currentRole==='owner')loadReviews();
   // Init map after short delay to let DOM settle
   if(currentRole==='manager')setTimeout(()=>initRiderMap(),400);
 }
@@ -455,56 +448,4 @@ function openAlertModal(){
 }
 function closeAlertModal(){
   document.getElementById('alertModal').style.display='none';
-}
-// ===== REVIEWS =====
-async function loadReviews(){
-  if(currentRole!=='owner')return;
-  renderReviews(getMockReviews());
-}
-
-function getMockReviews(){
-  return[
-    {name:'Rahul M.',rating:5,msg:'Super fast delivery! Got my groceries in 8 minutes.',time:'10:42 AM'},
-    {name:'Sneha K.',rating:4,msg:'Good service, packaging could be better.',time:'10:15 AM'},
-    {name:'Amit T.',rating:5,msg:'Best quick commerce in Mumbai. Always on time!',time:'09:58 AM'},
-    {name:'Priya D.',rating:3,msg:'Delivery was slightly late today but quality was good.',time:'09:30 AM'},
-    {name:'Karan S.',rating:5,msg:'Amazing experience, will definitely order again.',time:'09:10 AM'},
-  ];
-}
-
-function formatReview(r){
-  return{
-    name:'User ...'+r.phone.slice(-4),
-    rating:r.rating,
-    msg:r.message,
-    time:new Date(r.created_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
-  };
-}
-
-function renderReviews(reviews){
-  const container=document.getElementById('reviewsList');
-  if(!container)return;
-  const avg=(reviews.reduce((s,r)=>s+r.rating,0)/reviews.length).toFixed(1);
-  const stars=r=>'★'.repeat(r)+'☆'.repeat(5-r);
-  container.innerHTML=
-    `<div style="display:flex;align-items:center;gap:16px;padding:16px 24px;border-bottom:1px solid var(--border);background:var(--page-bg)">
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:32px;font-weight:700;color:var(--text-primary)">${avg}</span>
-      <div>
-        <div style="color:#f59e0b;font-size:18px;letter-spacing:2px">${stars(Math.round(avg))}</div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${reviews.length} reviews via WhatsApp</div>
-      </div>
-    </div>`+
-    reviews.map(r=>
-      `<div style="padding:16px 24px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:6px">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:30px;height:30px;border-radius:50%;background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${r.name[0]}</div>
-            <span style="font-weight:600;font-size:13px;color:var(--text-primary)">${r.name}</span>
-          </div>
-          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-faint)">${r.time}</span>
-        </div>
-        <div style="color:#f59e0b;font-size:13px;letter-spacing:1px">${stars(r.rating)}</div>
-        <div style="font-size:13px;color:var(--text-muted);line-height:1.5">${r.msg}</div>
-      </div>`
-    ).join('');
 }
