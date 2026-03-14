@@ -270,13 +270,14 @@ async function restoreSession() {
 
   const { data: { session } } = await _supabase.auth.getSession();
   if (!session) return;
-
-  const { data: profile } = await _supabase
-    .from('user_profiles')
-    .select('*')
-    .eq('user_id', session.user.id)
-    .single();
-
+  const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) return;
+    const { data: profile } = await _supabase
+      .from('user_profiles')
+      .select('business_id, order_target')
+      .eq('user_id', user.id)
+      .single();
+  
   if (!profile) return;
 
   currentUser = {
