@@ -220,12 +220,6 @@ function initDashboard(){
   document.getElementById('udMeta').innerHTML=roleBadge+' · '+currentUser.business+' · '+currentUser.city;
   document.getElementById('ownerView').style.display=currentRole==='owner'?'block':'none';
   document.getElementById('managerView').style.display=currentRole==='manager'?'block':'none';
-
- 
-  }
-
-
-
   delivHistory=Array.from({length:14},()=>7+Math.random()*6);
   alertLog=[];activeScenario='normal';
   renderDashboard();initCharts();startClock();startSentimentFeed();
