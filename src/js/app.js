@@ -221,14 +221,7 @@ function initDashboard(){
   document.getElementById('ownerView').style.display=currentRole==='owner'?'block':'none';
   document.getElementById('managerView').style.display=currentRole==='manager'?'block':'none';
 
-  // Inject WhatsApp settings card into owner view
-  if(currentRole==='owner'){
-    const ov=document.getElementById('ownerView');
-    if(ov&&!document.getElementById('waSettingsInOwner')){
-      const div=document.createElement('div');div.id='waSettingsInOwner';
-      div.innerHTML=renderWaSettingsCard();
-      ov.appendChild(div);
-    }
+  
   }
 
   // Inject rider map card into manager view
@@ -246,6 +239,8 @@ function initDashboard(){
   if(liveInterval)clearInterval(liveInterval);
   try{initSupabase();}catch(e){console.warn('Supabase skipped',e);}
   liveInterval=setInterval(liveUpdate,3000);
+  if(currentRole==='owner')loadReviews();
+  // Init map after short delay to let DOM settle
   if(currentRole==='manager')setTimeout(()=>initRiderMap(),400);
 }
 
@@ -446,36 +441,9 @@ function openAlertModal(){
 function closeAlertModal(){
   document.getElementById('alertModal').style.display='none';
 }
-//review
 async function loadReviews(){
   if(currentRole!=='owner')return;
-  const sb=window._supabase||_supabase;
-  if(!sb){renderReviews(getMockReviews());return;}
-  const {data,error}=await sb
-    .from('customer_reviews')
-    .select('*')
-    .order('created_at',{ascending:false})
-    .limit(10);
-  if(error||!data||!data.length){renderReviews(getMockReviews());return;}
-  renderReviews(data.map(formatReview));
-  sb.channel('reviews-live')
-    .on('postgres_changes',
-      {event:'INSERT',schema:'public',table:'customer_reviews'},
-      ()=>{
-        sb.from('customer_reviews').select('*')
-          .order('created_at',{ascending:false}).limit(10)
-          .then(({data})=>{if(data&&data.length)renderReviews(data.map(formatReview));});
-        showToast('New WhatsApp review received!');
-      }
-    ).subscribe();
-}
-function formatReview(r){
-  return{
-    name:r.name||r.phone||'Anonymous',
-    rating:r.rating||5,
-    msg:r.message||'',
-    time:r.created_at?new Date(r.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''
-  };
+  renderReviews(getMockReviews());
 }
 function getMockReviews(){
   return[
