@@ -491,8 +491,6 @@ function renderReviews(reviews){
   if(!container)return;
   const avg=(reviews.reduce((s,r)=>s+r.rating,0)/reviews.length).toFixed(1);
   const stars=r=>'★'.repeat(r)+'☆'.repeat(5-r);
-  const preview=reviews.slice(0,3);
-  const rest=reviews.slice(3);
   container.innerHTML=
     `<div style="display:flex;align-items:center;gap:16px;padding:16px 24px;border-bottom:1px solid var(--border);background:var(--page-bg)">
       <span style="font-family:'IBM Plex Mono',monospace;font-size:32px;font-weight:700;color:var(--text-primary)">${avg}</span>
@@ -500,39 +498,20 @@ function renderReviews(reviews){
         <div style="color:#f59e0b;font-size:18px;letter-spacing:2px">${stars(Math.round(avg))}</div>
         <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${reviews.length} reviews</div>
       </div>
-    </div>`+
-    preview.map(r=>
-      `<div style="padding:16px 24px;border-bottom:1px solid var(--border)">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:30px;height:30px;border-radius:50%;background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${r.name[0]}</div>
-            <span style="font-weight:600;font-size:13px;color:var(--text-primary)">${r.name}</span>
-          </div>
-          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-faint)">${r.time}</span>
-        </div>
-        <div style="color:#f59e0b;font-size:13px;letter-spacing:1px;margin-bottom:4px">${stars(r.rating)}</div>
-        <div style="font-size:13px;color:var(--text-muted);line-height:1.5">${r.msg}</div>
-      </div>`
-    ).join('')+
-    (rest.length?
-      `<div id="reviewsExtra" style="display:none">
-        ${rest.map(r=>
-          `<div style="padding:16px 24px;border-bottom:1px solid var(--border)">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-              <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:30px;height:30px;border-radius:50%;background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${r.name[0]}</div>
-                <span style="font-weight:600;font-size:13px;color:var(--text-primary)">${r.name}</span>
-              </div>
-              <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-faint)">${r.time}</span>
+    </div>
+    <div style="max-height:280px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent">
+      ${reviews.map(r=>
+        `<div style="padding:16px 24px;border-bottom:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:30px;height:30px;border-radius:50%;background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${r.name[0]}</div>
+              <span style="font-weight:600;font-size:13px;color:var(--text-primary)">${r.name}</span>
             </div>
-            <div style="color:#f59e0b;font-size:13px;letter-spacing:1px;margin-bottom:4px">${stars(r.rating)}</div>
-            <div style="font-size:13px;color:var(--text-muted);line-height:1.5">${r.msg}</div>
-          </div>`
-        ).join('')}
-      </div>
-      <div style="padding:14px 24px;text-align:center;cursor:pointer;color:var(--blue);font-size:13px;font-weight:600;border-top:1px solid var(--border)" 
-        onclick="const e=document.getElementById('reviewsExtra');const open=e.style.display==='block';e.style.display=open?'none':'block';this.textContent=open?'View all ${rest.length} more reviews ▼':'Show less ▲'">
-        View all ${rest.length} more reviews ▼
-      </div>`
-    :'');
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-faint)">${r.time}</span>
+          </div>
+          <div style="color:#f59e0b;font-size:13px;letter-spacing:1px;margin-bottom:4px">${stars(r.rating)}</div>
+          <div style="font-size:13px;color:var(--text-muted);line-height:1.5">${r.msg}</div>
+        </div>`
+      ).join('')}
+    </div>`;
 }
