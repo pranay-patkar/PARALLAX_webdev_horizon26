@@ -183,8 +183,14 @@
       <div id="ownerView" style="display:none">
         <div class="dash-grid two-col" style="margin-bottom:16px"><div class="card"><div class="card-header"><div><div class="card-title">Delivery Time Trend</div><div class="card-subtitle">Rolling 14-point average</div></div></div><div class="chart-wrap"><canvas id="chartDelivery"></canvas></div></div><div class="card"><div class="card-header"><div><div class="card-title">Cancellation Radar</div><div class="card-subtitle">By category — this week vs last</div></div></div><div class="chart-wrap"><canvas id="chartRadar"></canvas></div></div></div>
         <div class="card" style="margin-bottom:16px"><div class="card-header"><div><div class="card-title">Live Performance Meters</div></div></div><span class="btn-ghost" onclick="document.getElementById('speedoOrders').scrollIntoView({behavior:'smooth'})">View details →</span><div class="speedo-row"><div class="speedo-wrap" id="speedoOrders"></div><div class="speedo-wrap" id="speedoRevenue"></div></div></div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div><div class="card-title">⭐ Customer Reviews</div><div class="card-subtitle">Recent feedback via WhatsApp</div></div>
+          </div>
+          <div id="reviewsList"></div>
+        </div>
       </div>
-
+    
       <!-- MANAGER ONLY -->
       <div id="managerView" style="display:none">
         <div class="card" style="margin-bottom:16px">
