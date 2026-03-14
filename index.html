@@ -183,24 +183,17 @@
       <div id="ownerView" style="display:none">
         <div class="dash-grid two-col" style="margin-bottom:16px"><div class="card"><div class="card-header"><div><div class="card-title">Delivery Time Trend</div><div class="card-subtitle">Rolling 14-point average</div></div></div><div class="chart-wrap"><canvas id="chartDelivery"></canvas></div></div><div class="card"><div class="card-header"><div><div class="card-title">Cancellation Radar</div><div class="card-subtitle">By category — this week vs last</div></div></div><div class="chart-wrap"><canvas id="chartRadar"></canvas></div></div></div>
         <div class="card" style="margin-bottom:16px"><div class="card-header"><div><div class="card-title">Live Performance Meters</div></div></div><span class="btn-ghost" onclick="document.getElementById('speedoOrders').scrollIntoView({behavior:'smooth'})">View details →</span><div class="speedo-row"><div class="speedo-wrap" id="speedoOrders"></div><div class="speedo-wrap" id="speedoRevenue"></div></div></div>
-                    <!-- Customer Reviews Section -->
-<div class="card" style="margin-top:16px">
-  <div class="card-header">
-    <div>
-      <div class="card-title">Customer Reviews</div>
-      <div class="card-subtitle">Via WhatsApp · Live feedback</div>
-    </div>
-    <span class="badge badge-opportunity">WhatsApp</span>
-  </div>
-  <div id="reviewsList" style="display:flex;flex-direction:column;gap:0">
-    <div style="padding:20px;text-align:center;color:var(--text-faint);font-size:13px">
-      Loading reviews...
-    </div>
-  </div>
-</div>
+      </div>
 
       <!-- MANAGER ONLY -->
       <div id="managerView" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div><div class="card-title">🛵 Live Rider Tracker</div><div class="card-subtitle">Mumbai — real-time delivery positions</div></div>
+            <div id="riderLegend" style="display:flex;gap:16px;font-size:12px;font-family:'IBM Plex Mono',monospace"></div>
+          </div>
+          <div id="riderMap" style="height:320px;border-radius:4px;overflow:hidden;border:1px solid var(--border)"></div>
+        </div>
         <div class="dash-grid two-col-m" style="margin-bottom:16px">
           <div class="card"><div class="card-header"><div><div class="card-title">Stock Levels by Category</div></div></div><div class="inv-list" id="inventoryList"></div></div>
           <div class="card"><div class="card-header"><div><div class="card-title">Delivery Performance (Last 8h)</div></div></div><div class="chart-wrap"><canvas id="chartStacked"></canvas></div></div>
@@ -214,7 +207,6 @@
           <div class="alert-table" id="alertTableManager"></div>
         </div>
       </div>
-
       <!-- ALERTS (both roles) -->
       <div class="card" style="margin-bottom:20px"><div class="card-header"><div><div class="card-title">Live Alerts</div></div><span class="btn-ghost" onclick="openAlertModal()">View all alerts →</span></div><div class="alert-table" id="alertTable"></div></div>
     </div>
@@ -244,14 +236,13 @@
 <script src="src/js/rider-map.js"></script>
 <script src="src/js/demo-mode.js"></script>
 <script src="src/js/app.js"></script>
-  <div id="alertModal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px)" onclick="if(event.target===this)closeAlertModal()">
+</body>
+</html><div id="alertModal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px)" onclick="if(event.target===this)closeAlertModal()">
   <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(600px,90vw);max-height:80vh;overflow-y:auto;background:var(--card-bg);border-radius:8px;border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,0.4)">
     <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--card-bg)">
       <div style="font-weight:700;font-size:16px;font-family:'Playfair Display',serif">🔔 Alert History</div>
       <button class="btn-ghost" onclick="closeAlertModal()">✕ Close</button>
     </div>
-</body>
-</html>
     <div id="alertModalBody" style="padding:8px 0"></div>
   </div>
 </div>
