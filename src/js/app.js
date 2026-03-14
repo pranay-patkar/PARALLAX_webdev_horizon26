@@ -233,11 +233,10 @@ function initDashboard(){
 
   // Inject rider map card into manager view
   if(currentRole==='manager'){
-    // Inject WA settings for manager too
-    if(mv&&!document.getElementById('waSettingsInManager')){
+    if(document.getElementById('managerView')&&!document.getElementById('waSettingsInManager')){
       const div=document.createElement('div');div.id='waSettingsInManager';
-      div.innerHTML=renderWaSettingsCard();
-      mv.appendChild(div);
+      div.innerHTML=renderWaSettingsCard('Manager');
+      document.getElementById('managerView').appendChild(div);
     }
   }
 
@@ -448,4 +447,44 @@ function openAlertModal(){
 }
 function closeAlertModal(){
   document.getElementById('alertModal').style.display='none';
+}
+async function loadReviews(){
+  if(currentRole!=='owner')return;
+  renderReviews(getMockReviews());
+}
+function getMockReviews(){
+  return[
+    {name:'Rahul M.',rating:5,msg:'Super fast delivery! Got my groceries in 8 minutes.',time:'10:42 AM'},
+    {name:'Sneha K.',rating:4,msg:'Good service, packaging could be better.',time:'10:15 AM'},
+    {name:'Amit T.',rating:5,msg:'Best quick commerce in Mumbai. Always on time!',time:'09:58 AM'},
+    {name:'Priya D.',rating:3,msg:'Delivery was slightly late today but quality was good.',time:'09:30 AM'},
+    {name:'Karan S.',rating:5,msg:'Amazing experience, will definitely order again.',time:'09:10 AM'},
+  ];
+}
+function renderReviews(reviews){
+  const container=document.getElementById('reviewsList');
+  if(!container)return;
+  const avg=(reviews.reduce((s,r)=>s+r.rating,0)/reviews.length).toFixed(1);
+  const stars=r=>'★'.repeat(r)+'☆'.repeat(5-r);
+  container.innerHTML=
+    `<div style="display:flex;align-items:center;gap:16px;padding:16px 24px;border-bottom:1px solid var(--border);background:var(--page-bg)">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:32px;font-weight:700;color:var(--text-primary)">${avg}</span>
+      <div>
+        <div style="color:#f59e0b;font-size:18px;letter-spacing:2px">${stars(Math.round(avg))}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${reviews.length} reviews</div>
+      </div>
+    </div>`+
+    reviews.map(r=>
+      `<div style="padding:16px 24px;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:30px;height:30px;border-radius:50%;background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${r.name[0]}</div>
+            <span style="font-weight:600;font-size:13px;color:var(--text-primary)">${r.name}</span>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-faint)">${r.time}</span>
+        </div>
+        <div style="color:#f59e0b;font-size:13px;letter-spacing:1px;margin-bottom:4px">${stars(r.rating)}</div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.5">${r.msg}</div>
+      </div>`
+    ).join('');
 }
