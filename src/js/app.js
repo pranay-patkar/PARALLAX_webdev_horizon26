@@ -8,6 +8,7 @@ let liveData={stock:65,delivery:8,orders:120,cancel:8,revenue:62};
 let delivHistory=[],orderPeak=0,alertLog=[],activeScenario='normal';
 let delivChart=null,radarChart=null,stackedChart=null,liveInterval=null,crisisAlertShown=false;
 
+// ── Sentiment feed data ────────────────────────────────────────────────────
 const SENTIMENTS_POSITIVE=[
   'Delivery was super fast! 🔥','Order arrived in 8 mins, amazing!','Great packaging on my order 👍',
   'Love the app, keep it up!','My rider was so polite, 5 stars!','Fresh vegetables, very happy!',
@@ -57,6 +58,7 @@ function injectTickerItem(html){
   while(feed.children.length>6)feed.removeChild(feed.lastChild);
 }
 
+// ── Screen / util helpers ─────────────────────────────────────────────────
 function showScreen(n){
   document.getElementById('loginScreen').style.display=n==='login'?'block':'none';
   document.getElementById('signupScreen').style.display=n==='signup'?'block':'none';
@@ -171,6 +173,7 @@ function signOut(){
   hideError('loginError');showScreen('login');
 }
 
+// ── Scenarios ─────────────────────────────────────────────────────────────
 const SCENARIOS={
   normal:      {stock:65, delivery:8,  orders:120, cancel:8,  revenue:62,  label:'Normal Operations'},
   opportunity: {stock:85, delivery:7,  orders:185, cancel:5,  revenue:88,  label:'Peak Opportunity'},
@@ -208,6 +211,7 @@ function calcStressScore(d){
   return{stockS:Math.round(stockS),delivS:Math.round(delivS),orderS:Math.round(orderS),cancelS:Math.round(cancelS),total:Math.round(stockS*0.35+delivS*0.30+orderS*0.25+cancelS*0.10)};
 }
 
+// ── Dashboard init ────────────────────────────────────────────────────────
 function initDashboard(){
   document.getElementById('navAvatar').textContent=currentUser.avatar;
   document.getElementById('udAvatar').textContent=currentUser.avatar;
@@ -216,19 +220,42 @@ function initDashboard(){
   document.getElementById('udMeta').innerHTML=roleBadge+' · '+currentUser.business+' · '+currentUser.city;
   document.getElementById('ownerView').style.display=currentRole==='owner'?'block':'none';
   document.getElementById('managerView').style.display=currentRole==='manager'?'block':'none';
+
+  // Inject WhatsApp settings card into owner view
+  if(currentRole==='owner'){
+    const ov=document.getElementById('ownerView');
+    if(ov&&!document.getElementById('waSettingsInOwner')){
+      const div=document.createElement('div');div.id='waSettingsInOwner';
+      div.innerHTML=renderWaSettingsCard();
+      ov.appendChild(div);
+    }
+  }
+
+  // Inject rider map card into manager view
+  if(currentRole==='manager'){
+    if(document.getElementById('managerView')&&!document.getElementById('waSettingsInManager')){
+      const div=document.createElement('div');div.id='waSettingsInManager';
+      div.innerHTML=renderWaSettingsCard('Manager');
+      document.getElementById('managerView').appendChild(div);
+    }
+  }
+
   delivHistory=Array.from({length:14},()=>7+Math.random()*6);
   alertLog=[];activeScenario='normal';
   renderDashboard();initCharts();startClock();startSentimentFeed();
   if(liveInterval)clearInterval(liveInterval);
   try{initSupabase();}catch(e){console.warn('Supabase skipped',e);}
   liveInterval=setInterval(liveUpdate,3000);
-  if(currentRole==='owner')loadReviews();
   if(currentRole==='manager')setTimeout(()=>initRiderMap(),400);
 }
 
+// ── Render dashboard ──────────────────────────────────────────────────────
 function renderDashboard(){
   const d=liveData,score=calcStressScore(d);
+
+  // WhatsApp threshold check
   if(typeof checkWhatsAppTrigger==='function')checkWhatsAppTrigger(score.total);
+
   if(currentRole==='owner'){
     document.getElementById('pageTitle').textContent='Business Health Dashboard';
     document.getElementById('pageSubtitle').textContent=currentUser.business+' - '+currentUser.city+' · '+currentUser.category+' · '+currentUser.size;
@@ -278,6 +305,7 @@ function renderDashboard(){
       const lbl=a.level==='HIGH'?'HIGH':a.level==='MED'?'MED':'--';
       return'<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border)"><div style="display:flex;align-items:center;gap:12px"><span style="width:8px;height:8px;border-radius:50%;background:'+dot+';flex-shrink:0;display:inline-block"></span><span style="font-size:14px;color:var(--text-primary)">'+a.text+'</span></div><span style="font-size:11px;font-family:\'IBM Plex Mono\',monospace;color:var(--text-faint);background:var(--border);padding:2px 8px;border-radius:3px">'+lbl+'</span></div>';
     }).join('');
+    // Update rider map
     updateRiderMap();
   }
   updateAlertBanner(d,score);
@@ -381,6 +409,7 @@ function openWarRoom(label){
 }
 function closeWarRoom(){document.getElementById('warRoom').classList.remove('open');}
 
+// ── Charts ────────────────────────────────────────────────────────────────
 function getChartDefaults(){
   const isDark=document.documentElement.getAttribute('data-theme')==='dark';
   return{gridColor:isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)',labelColor:isDark?'#8b949e':'#6b7280'};
@@ -417,9 +446,36 @@ function openAlertModal(){
 function closeAlertModal(){
   document.getElementById('alertModal').style.display='none';
 }
+//review
 async function loadReviews(){
   if(currentRole!=='owner')return;
-  renderReviews(getMockReviews());
+  const sb=window._supabase||_supabase;
+  if(!sb){renderReviews(getMockReviews());return;}
+  const {data,error}=await sb
+    .from('customer_reviews')
+    .select('*')
+    .order('created_at',{ascending:false})
+    .limit(10);
+  if(error||!data||!data.length){renderReviews(getMockReviews());return;}
+  renderReviews(data.map(formatReview));
+  sb.channel('reviews-live')
+    .on('postgres_changes',
+      {event:'INSERT',schema:'public',table:'customer_reviews'},
+      ()=>{
+        sb.from('customer_reviews').select('*')
+          .order('created_at',{ascending:false}).limit(10)
+          .then(({data})=>{if(data&&data.length)renderReviews(data.map(formatReview));});
+        showToast('New WhatsApp review received!');
+      }
+    ).subscribe();
+}
+function formatReview(r){
+  return{
+    name:r.name||r.phone||'Anonymous',
+    rating:r.rating||5,
+    msg:r.message||'',
+    time:r.created_at?new Date(r.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''
+  };
 }
 function getMockReviews(){
   return[
