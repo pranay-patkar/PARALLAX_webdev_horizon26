@@ -4,11 +4,12 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 let _supabase      = null;
 let _realtimeChannel = null;
 
-async function initSupabase() {
+async function initSupabase(){
   _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   window._supabase = _supabase;
   await loadLatestMetrics();
   startRealtimeListener();
+  if(typeof loadReviews === 'function') loadReviews(); // ← ADD THIS LINE
 }
 
 async function loadLatestMetrics() {
