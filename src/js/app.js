@@ -492,14 +492,18 @@ function renderReviews(reviews){
   const avg=(reviews.reduce((s,r)=>s+r.rating,0)/reviews.length).toFixed(1);
   const stars=r=>'★'.repeat(r)+'☆'.repeat(5-r);
   container.innerHTML=
-    `<div style="display:flex;align-items:center;gap:16px;padding:16px 24px;border-bottom:1px solid var(--border);background:var(--page-bg)">
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:32px;font-weight:700;color:var(--text-primary)">${avg}</span>
-      <div>
-        <div style="color:#f59e0b;font-size:18px;letter-spacing:2px">${stars(Math.round(avg))}</div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${reviews.length} reviews</div>
+    `<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border);background:var(--page-bg);cursor:pointer"
+      onclick="const b=document.getElementById('reviewsBody');const open=b.style.display==='block';b.style.display=open?'none':'block';document.getElementById('reviewsChevron').textContent=open?'▼':'▲'">
+      <div style="display:flex;align-items:center;gap:16px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:32px;font-weight:700;color:var(--text-primary)">${avg}</span>
+        <div>
+          <div style="color:#f59e0b;font-size:18px;letter-spacing:2px">${stars(Math.round(avg))}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${reviews.length} reviews</div>
+        </div>
       </div>
+      <span id="reviewsChevron" style="font-size:13px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace">▼ Click to view</span>
     </div>
-    <div style="max-height:280px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent">
+    <div id="reviewsBody" style="display:none;max-height:280px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent">
       ${reviews.map(r=>
         `<div style="padding:16px 24px;border-bottom:1px solid var(--border)">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
